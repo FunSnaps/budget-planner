@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "svelte-kit sync && vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -28,10 +28,13 @@
     "vitest": "^2.1.0"
   },
   "dependencies": {
-    "@lucia-auth/adapter-postgresql": "^1.0.2",
+    "@lucia-auth/adapter-postgresql": "^3.0.0",
     "@node-rs/argon2": "^1.8.3",
     "lucia": "^3.2.0",
     "pg": "^8.12.0"
   },
-  "type": "module"
+  "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "svelte-preprocess", "@node-rs/argon2"]
+  }
 }
