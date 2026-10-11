@@ -6,12 +6,9 @@
   $: bonusItems = $state.bonus;
   $: bonusTotal = $totals.bonus;
 
-  // How much bonus is applied to each category
-  let applyNeeds = 0;
-  let applyWants = 0;
-  let applySavings = 0;
+  let applyAmounts = { applyNeeds: 0, applyWants: 0, applySavings: 0 };
 
-  $: applied = applyNeeds + applyWants + applySavings;
+  $: applied = applyAmounts.applyNeeds + applyAmounts.applyWants + applyAmounts.applySavings;
   $: remaining = bonusTotal - applied;
 
   function addBonusItem() {
@@ -52,12 +49,12 @@
         amt > 0 ? [...items, { label: 'Bonus applied', amount: amt }] : items;
       return {
         ...s,
-        needs:   addIfNonZero(s.needs,   applyNeeds),
-        wants:   addIfNonZero(s.wants,   applyWants),
-        savings: addIfNonZero(s.savings, applySavings),
+        needs:   addIfNonZero(s.needs,   applyAmounts.applyNeeds),
+        wants:   addIfNonZero(s.wants,   applyAmounts.applyWants),
+        savings: addIfNonZero(s.savings, applyAmounts.applySavings),
       } as BudgetState;
     });
-    applyNeeds = 0; applyWants = 0; applySavings = 0;
+    applyAmounts = { applyNeeds: 0, applyWants: 0, applySavings: 0 };
   }
 </script>
 
@@ -119,7 +116,7 @@
             <div class="amt-field">
               <span class="cur">£</span>
               <input class="mini-input" type="number" min="0" step="1"
-                bind:value={bindKey === 'applyNeeds' ? applyNeeds : bindKey === 'applyWants' ? applyWants : applySavings}
+                bind:value={applyAmounts[bindKey as keyof typeof applyAmounts]}
                 placeholder="0" />
             </div>
           </div>
