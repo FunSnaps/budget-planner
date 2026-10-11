@@ -3,7 +3,7 @@ from datetime import datetime
 from uuid import UUID
 from typing import Any
 
-from ....domain.entities.budget import Budget, BudgetState, BudgetStateItem
+from .....domain.entities.budget import Budget, BudgetState, BudgetStateItem
 
 
 # ---------- request schemas (HTTP → domain) ----------

@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from .budget_schemas import BudgetOut
-from ....domain.entities.share import ResolvedShare
+from .....domain.entities.share import ResolvedShare
 
 
 class CreateShareRequest(BaseModel):

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/v1", tags=["shares"])
 
 
 @router.post(
-    "/users/{user_id}/budgets/{budget_id}/share",
+    "/users/{user_id}/budget/saves/{budget_id}/share",
     response_model=ShareOut,
     status_code=status.HTTP_201_CREATED,
 )

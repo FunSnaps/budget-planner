@@ -57,7 +57,7 @@ async def upsert_active(
     return BudgetOut.from_domain(budget)
 
 
-@router.get("/users/{user_id}/budgets", response_model=list[BudgetOut])
+@router.get("/users/{user_id}/budget/saves", response_model=list[BudgetOut])
 async def list_user_saves(
     user_id: str,
     uid: str = Depends(require_user),
@@ -69,7 +69,7 @@ async def list_user_saves(
 
 
 @router.post(
-    "/users/{user_id}/budgets",
+    "/users/{user_id}/budget/saves",
     response_model=BudgetOut,
     status_code=status.HTTP_201_CREATED,
 )
@@ -85,7 +85,7 @@ async def create_user_save(
     return BudgetOut.from_domain(budget)
 
 
-@router.put("/users/{user_id}/budgets/{budget_id}", response_model=BudgetOut)
+@router.patch("/users/{user_id}/budget/saves/{budget_id}", response_model=BudgetOut)
 async def update_user_save(
     user_id: str,
     budget_id: UUID,
@@ -108,7 +108,7 @@ async def update_user_save(
 
 
 @router.delete(
-    "/users/{user_id}/budgets/{budget_id}",
+    "/users/{user_id}/budget/saves/{budget_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_user_save(
