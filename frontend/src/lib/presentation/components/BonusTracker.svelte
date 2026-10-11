@@ -6,9 +6,11 @@
   $: bonusItems = $state.bonus;
   $: bonusTotal = $totals.bonus;
 
-  let applyAmounts = { applyNeeds: 0, applyWants: 0, applySavings: 0 };
+  let applyNeeds = 0;
+  let applyWants = 0;
+  let applySavings = 0;
 
-  $: applied = applyAmounts.applyNeeds + applyAmounts.applyWants + applyAmounts.applySavings;
+  $: applied = applyNeeds + applyWants + applySavings;
   $: remaining = bonusTotal - applied;
 
   function addBonusItem() {
@@ -49,12 +51,12 @@
         amt > 0 ? [...items, { label: 'Bonus applied', amount: amt }] : items;
       return {
         ...s,
-        needs:   addIfNonZero(s.needs,   applyAmounts.applyNeeds),
-        wants:   addIfNonZero(s.wants,   applyAmounts.applyWants),
-        savings: addIfNonZero(s.savings, applyAmounts.applySavings),
+        needs:   addIfNonZero(s.needs,   applyNeeds),
+        wants:   addIfNonZero(s.wants,   applyWants),
+        savings: addIfNonZero(s.savings, applySavings),
       } as BudgetState;
     });
-    applyAmounts = { applyNeeds: 0, applyWants: 0, applySavings: 0 };
+    applyNeeds = 0; applyWants = 0; applySavings = 0;
   }
 </script>
 
@@ -107,20 +109,27 @@
 
     {#if bonusTotal > 0}
       <div class="bonus-apply-bar">
-        {#each [['Needs', '#0088a0', 'applyNeeds'], ['Wants', '#c98a00', 'applyWants'], ['Savings', '#0ca30c', 'applySavings']] as [label, color, bindKey]}
-          <div class="apply-field">
-            <label>
-              <span class="dot" style="background:{color}"></span>
-              {label}
-            </label>
-            <div class="amt-field">
-              <span class="cur">£</span>
-              <input class="mini-input" type="number" min="0" step="1"
-                bind:value={applyAmounts[bindKey as keyof typeof applyAmounts]}
-                placeholder="0" />
-            </div>
+        <div class="apply-field">
+          <label><span class="dot" style="background:#0088a0"></span>Needs</label>
+          <div class="amt-field">
+            <span class="cur">£</span>
+            <input class="mini-input" type="number" min="0" step="1" bind:value={applyNeeds} placeholder="0" />
           </div>
-        {/each}
+        </div>
+        <div class="apply-field">
+          <label><span class="dot" style="background:#c98a00"></span>Wants</label>
+          <div class="amt-field">
+            <span class="cur">£</span>
+            <input class="mini-input" type="number" min="0" step="1" bind:value={applyWants} placeholder="0" />
+          </div>
+        </div>
+        <div class="apply-field">
+          <label><span class="dot" style="background:#0ca30c"></span>Savings</label>
+          <div class="amt-field">
+            <span class="cur">£</span>
+            <input class="mini-input" type="number" min="0" step="1" bind:value={applySavings} placeholder="0" />
+          </div>
+        </div>
 
         <div class="apply-remaining" class:is-unallocated={remaining < 0}>
           {remaining >= 0 ? fmt(remaining) : `−${fmt(Math.abs(remaining))}`} remaining
