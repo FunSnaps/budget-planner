@@ -19,10 +19,18 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 # Override sqlalchemy.url with env var at runtime
+# asyncpg uses ?ssl=require not ?sslmode=require — strip libpq-only params
 database_url = os.environ.get("DATABASE_URL", "")
-if database_url and not database_url.startswith("postgresql+asyncpg"):
-    database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 if database_url:
+    database_url = (
+        database_url
+        .replace("postgresql://", "postgresql+asyncpg://", 1)
+        .replace("postgresql+psycopg2://", "postgresql+asyncpg://", 1)
+        .replace("sslmode=require", "ssl=require")
+        .replace("&channel_binding=require", "")
+        .replace("channel_binding=require&", "")
+        .replace("channel_binding=require", "")
+    )
     config.set_main_option("sqlalchemy.url", database_url)
 
 
