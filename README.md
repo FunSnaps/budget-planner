@@ -4,13 +4,13 @@ A full-stack budget planner built around the 50/30/20 rule (needs / wants / savi
 
 ## Features
 
-- **Budget planner** — enter monthly take-home, log line items under Needs, Wants and Savings, and see gauges against the 50/30/20 targets.
-- **Gross salary helper** — estimates take-home from gross salary (UK 2024/25 income tax + NI).
-- **Bonus and one-off costs** — log windfalls and split them across categories; track annual costs as a monthly set-aside.
-- **Saved budgets** — snapshot, reload and delete named budgets. The active budget auto-saves.
-- **Share links** — read-only link to a saved budget, no login needed.
-- **Split bills by income** (`/split`) — divide shared bills by take-home or gross salary instead of 50/50, with per-bill payer and a settle-up summary. Stored in the browser only.
-- **Accounts** — email and password sign-up, session cookies.
+- **Budget planner**: enter monthly take-home, log line items under Needs, Wants and Savings, and see gauges against the 50/30/20 targets.
+- **Gross salary helper**: estimates take-home from gross salary (UK 2024/25 income tax + NI).
+- **Bonus and one-off costs**: log windfalls and split them across categories; track annual costs as a monthly set-aside.
+- **Saved budgets**: snapshot, reload and delete named budgets. The active budget auto-saves.
+- **Share links**: read-only link to a saved budget, no login needed.
+- **Split bills by income** (`/split`): divide shared bills by take-home or gross salary instead of 50/50, with per-bill payer and a settle-up summary. Stored in the browser only.
+- **Accounts**: email and password sign-up, session cookies.
 
 ## Architecture
 

@@ -29,7 +29,7 @@ export const actions: Actions = {
     );
     const user = result.rows[0];
 
-    // constant-time comparison path — always run verify even if user not found
+    // constant-time comparison path, always run verify even if user not found
     const hash = user?.hashed_password ?? '$argon2id$v=19$m=16,t=2,p=1$AAAA$AAAA';
     const valid = user && await verify(hash, password);
 

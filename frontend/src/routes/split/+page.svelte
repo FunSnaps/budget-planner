@@ -109,7 +109,7 @@
     {/if}
 
     <div class="bar" aria-hidden="true">
-      {#each people as p, i}
+      {#each people as _p, i}
         <div style="flex:{Math.max(r.fractions[i], 0.0001)};background:{COLORS[i % COLORS.length]}"></div>
       {/each}
     </div>
@@ -122,7 +122,7 @@
       {/each}
     </div>
     {#if r.usedEqualFallback}
-      <p class="kv-note">Enter incomes above — until then the bills are split equally.</p>
+      <p class="kv-note">Enter incomes above. Until then the bills are split equally.</p>
     {/if}
   </div>
 
@@ -192,7 +192,7 @@
       <div class="settle">
         <h4>Settle up</h4>
         {#if r.transfers.length === 0}
-          <p class="good">All square — everyone is already paying their share.</p>
+          <p class="good">All square. Everyone is already paying their share.</p>
         {:else}
           <ul>
             {#each r.transfers as t}
@@ -219,7 +219,7 @@
               {#if b.amount > 0}
                 <tr>
                   <td>{b.label || 'Untitled'}</td>
-                  {#each people as p, pi}<td class="r num">{fmt(r.shares[bi][pi])}</td>{/each}
+                  {#each people as _p, pi}<td class="r num">{fmt(r.shares[bi][pi])}</td>{/each}
                   <td class="r num">{fmt(b.amount)}</td>
                 </tr>
               {/if}
@@ -228,7 +228,7 @@
           <tfoot>
             <tr>
               <td>Total</td>
-              {#each people as p, pi}<td class="r num">{fmt(r.owed[pi])}</td>{/each}
+              {#each people as _p, pi}<td class="r num">{fmt(r.owed[pi])}</td>{/each}
               <td class="r num">{fmt(r.total)}</td>
             </tr>
           </tfoot>

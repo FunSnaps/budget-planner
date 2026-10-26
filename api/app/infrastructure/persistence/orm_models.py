@@ -1,8 +1,12 @@
-from sqlalchemy import String, Text, DateTime, ForeignKey, CheckConstraint
+from sqlalchemy import JSON, String, Text, DateTime, ForeignKey, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from datetime import datetime, timezone
 import uuid
+
+
+# JSONB on Postgres; plain JSON so the SQLite test database can create the table
+JSONType = JSONB().with_variant(JSON(), "sqlite")
 
 
 def _utcnow() -> datetime:
@@ -21,7 +25,7 @@ class BudgetORM(Base):
     )
     user_id: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str | None] = mapped_column(Text, nullable=True)
-    state: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    state: Mapped[dict] = mapped_column(JSONType, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow
     )

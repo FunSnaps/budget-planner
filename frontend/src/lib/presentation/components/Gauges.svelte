@@ -1,6 +1,6 @@
 <script lang="ts">
   import { state, totals, gaugeStatuses } from '$lib/application/stores/budgetStore';
-  import { CATS, fmt, pct } from '$lib/domain/planner';
+  import { CATS, fmt } from '$lib/domain/planner';
 
   $: th = $state.takeHome;
 </script>

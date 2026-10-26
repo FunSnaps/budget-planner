@@ -33,7 +33,7 @@ export interface Transfer {
 export interface SplitResult {
   /** Each person's fraction of the bills (sums to 1) */
   fractions: number[];
-  /** shares[billIndex][personIndex] in £ — each row sums exactly to the bill amount */
+  /** shares[billIndex][personIndex] in £, each row sums exactly to the bill amount */
   shares: number[][];
   /** Total each person owes across all bills */
   owed: number[];

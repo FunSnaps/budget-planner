@@ -37,14 +37,14 @@ async def test_upsert_active_persists_state(client: AsyncClient):
 async def test_create_and_list_saves(client: AsyncClient):
     state = {**EMPTY_STATE, "takeHome": 1800.0}
     r = await client.post(
-        f"/api/v1/users/{USER_ID}/budgets",
+        f"/api/v1/users/{USER_ID}/budget/saves",
         json={"name": "September", "state": state},
         headers=HEADERS,
     )
     assert r.status_code == 201
     budget_id = r.json()["id"]
 
-    r2 = await client.get(f"/api/v1/users/{USER_ID}/budgets", headers=HEADERS)
+    r2 = await client.get(f"/api/v1/users/{USER_ID}/budget/saves", headers=HEADERS)
     assert r2.status_code == 200
     assert any(b["id"] == budget_id for b in r2.json())
 
@@ -53,25 +53,25 @@ async def test_create_and_list_saves(client: AsyncClient):
 async def test_delete_save(client: AsyncClient):
     state = {**EMPTY_STATE, "takeHome": 1000.0}
     r = await client.post(
-        f"/api/v1/users/{USER_ID}/budgets",
+        f"/api/v1/users/{USER_ID}/budget/saves",
         json={"name": "To delete", "state": state},
         headers=HEADERS,
     )
     budget_id = r.json()["id"]
 
     del_r = await client.delete(
-        f"/api/v1/users/{USER_ID}/budgets/{budget_id}", headers=HEADERS
+        f"/api/v1/users/{USER_ID}/budget/saves/{budget_id}", headers=HEADERS
     )
     assert del_r.status_code == 204
 
-    list_r = await client.get(f"/api/v1/users/{USER_ID}/budgets", headers=HEADERS)
+    list_r = await client.get(f"/api/v1/users/{USER_ID}/budget/saves", headers=HEADERS)
     assert not any(b["id"] == budget_id for b in list_r.json())
 
 
 @pytest.mark.asyncio
 async def test_forbidden_for_other_user(client: AsyncClient):
     r = await client.get(
-        f"/api/v1/users/other-user/budget/active",
+        "/api/v1/users/other-user/budget/active",
         headers=HEADERS,
     )
     assert r.status_code == 403

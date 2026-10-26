@@ -2,7 +2,6 @@
   import { state, saves, isSaving } from '$lib/application/stores/budgetStore';
   import { toasts } from '$lib/application/stores/toastStore';
   import { shareBudget } from '$lib/application/use-cases/shareBudget';
-  import { fmt } from '$lib/domain/planner';
   import type { IBudgetService } from '$lib/domain/ports/IBudgetService';
   import type { Budget } from '$lib/domain/entities/Budget';
 

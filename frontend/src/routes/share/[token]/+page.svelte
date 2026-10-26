@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  import { fmt, sum, CATS, statusFor } from '$lib/domain/planner';
+  import { fmt, sum, CATS } from '$lib/domain/planner';
 
   export let data: PageData;
 

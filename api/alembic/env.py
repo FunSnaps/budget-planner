@@ -19,7 +19,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 # Override sqlalchemy.url with env var at runtime
-# asyncpg uses ?ssl=require not ?sslmode=require — strip libpq-only params
+# asyncpg uses ?ssl=require not ?sslmode=require, so strip libpq-only params
 database_url = os.environ.get("DATABASE_URL", "")
 if database_url:
     database_url = (

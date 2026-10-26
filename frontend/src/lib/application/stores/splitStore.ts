@@ -36,7 +36,7 @@ export function loadSplit(): void {
       split.set(parsed);
     }
   } catch {
-    /* storage unavailable or corrupt — keep defaults */
+    /* storage unavailable or corrupt, keep defaults */
   }
 }
 

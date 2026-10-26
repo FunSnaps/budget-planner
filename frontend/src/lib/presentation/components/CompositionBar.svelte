@@ -58,7 +58,7 @@
     </p>
   {:else if $unallocated > 0.5}
     <p class="kv-note">
-      <strong>{fmt($unallocated)}</strong> unallocated — add it to Savings or Wants.
+      <strong>{fmt($unallocated)}</strong> unallocated. Add it to Savings or Wants.
     </p>
   {/if}
 </div>

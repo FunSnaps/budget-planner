@@ -1,6 +1,6 @@
 <script lang="ts">
   import { state } from '$lib/application/stores/budgetStore';
-  import { fmt, annualFromMonthly, estimateTakeHome, monthlyFromAnnual } from '$lib/domain/planner';
+  import { fmt, annualFromMonthly } from '$lib/domain/planner';
   import { CATS } from '$lib/domain/planner';
   import { totals } from '$lib/application/stores/budgetStore';
 
@@ -14,22 +14,6 @@
     state.update((s) => ({ ...s, roleLabel: val }));
   }
 
-  function onSalaryInput(e: Event) {
-    const val = parseFloat((e.target as HTMLInputElement).value) || 0;
-    state.update((s) => ({ ...s, annualSalary: val }));
-  }
-
-  function onBonusInput(e: Event) {
-    const val = parseFloat((e.target as HTMLInputElement).value) || 0;
-    state.update((s) => ({ ...s, annualBonus: val }));
-  }
-
-  function fillFromSalary() {
-    state.update((s) => ({
-      ...s,
-      takeHome: Math.round(monthlyFromAnnual(estimateTakeHome(s.annualSalary))),
-    }));
-  }
 </script>
 
 <div class="card hero">

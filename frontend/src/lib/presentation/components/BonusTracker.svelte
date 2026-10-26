@@ -1,6 +1,6 @@
 <script lang="ts">
   import { state, totals } from '$lib/application/stores/budgetStore';
-  import { fmt, sum } from '$lib/domain/planner';
+  import { fmt } from '$lib/domain/planner';
   import type { BudgetState } from '$lib/domain/entities/Budget';
 
   $: bonusItems = $state.bonus;
@@ -110,24 +110,24 @@
     {#if bonusTotal > 0}
       <div class="bonus-apply-bar">
         <div class="apply-field">
-          <label><span class="dot" style="background:#0088a0"></span>Needs</label>
+          <label for="apply-needs"><span class="dot" style="background:#0088a0"></span>Needs</label>
           <div class="amt-field">
             <span class="cur">£</span>
-            <input class="mini-input" type="number" min="0" step="1" bind:value={applyNeeds} placeholder="0" />
+            <input class="mini-input" type="number" min="0" step="1" id="apply-needs" bind:value={applyNeeds} placeholder="0" />
           </div>
         </div>
         <div class="apply-field">
-          <label><span class="dot" style="background:#c98a00"></span>Wants</label>
+          <label for="apply-wants"><span class="dot" style="background:#c98a00"></span>Wants</label>
           <div class="amt-field">
             <span class="cur">£</span>
-            <input class="mini-input" type="number" min="0" step="1" bind:value={applyWants} placeholder="0" />
+            <input class="mini-input" type="number" min="0" step="1" id="apply-wants" bind:value={applyWants} placeholder="0" />
           </div>
         </div>
         <div class="apply-field">
-          <label><span class="dot" style="background:#0ca30c"></span>Savings</label>
+          <label for="apply-savings"><span class="dot" style="background:#0ca30c"></span>Savings</label>
           <div class="amt-field">
             <span class="cur">£</span>
-            <input class="mini-input" type="number" min="0" step="1" bind:value={applySavings} placeholder="0" />
+            <input class="mini-input" type="number" min="0" step="1" id="apply-savings" bind:value={applySavings} placeholder="0" />
           </div>
         </div>
 

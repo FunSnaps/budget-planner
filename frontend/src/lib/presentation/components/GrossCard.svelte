@@ -30,7 +30,7 @@
   >
     <div>
       <h3>Gross reference</h3>
-      <p class="cap">Optional — estimate take-home from salary</p>
+      <p class="cap">Optional: estimate take-home from salary</p>
     </div>
     <div class="card-head-right">
       <span class="collapse-toggle"><span class="chev">▾</span></span>
@@ -60,7 +60,7 @@
           <div class="stat-label">Est. monthly take-home</div>
           <div class="stat-value-input">
             <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;color:var(--ink)">
-              {$state.annualSalary ? fmt(monthlyFromAnnual(estimateTakeHome($state.annualSalary))) : '—'}
+              {$state.annualSalary ? fmt(monthlyFromAnnual(estimateTakeHome($state.annualSalary))) : '-'}
             </span>
           </div>
         </div>

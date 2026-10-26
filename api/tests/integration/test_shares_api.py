@@ -13,7 +13,7 @@ EMPTY_STATE = {
 async def test_create_and_resolve_share(client: AsyncClient):
     # Create a named save first
     r = await client.post(
-        f"/api/v1/users/{USER_ID}/budgets",
+        f"/api/v1/users/{USER_ID}/budget/saves",
         json={"name": "Shared budget", "state": {**EMPTY_STATE, "takeHome": 3000}},
         headers=HEADERS,
     )
@@ -22,7 +22,7 @@ async def test_create_and_resolve_share(client: AsyncClient):
 
     # Create share link
     share_r = await client.post(
-        f"/api/v1/users/{USER_ID}/budgets/{budget_id}/share",
+        f"/api/v1/users/{USER_ID}/budget/saves/{budget_id}/share",
         json={"permission": "view"},
         headers=HEADERS,
     )
@@ -48,7 +48,7 @@ async def test_resolve_unknown_token_returns_404(client: AsyncClient):
 async def test_share_unknown_budget_returns_404(client: AsyncClient):
     fake_id = "00000000-0000-0000-0000-000000000000"
     r = await client.post(
-        f"/api/v1/users/{USER_ID}/budgets/{fake_id}/share",
+        f"/api/v1/users/{USER_ID}/budget/saves/{fake_id}/share",
         json={"permission": "view"},
         headers=HEADERS,
     )
