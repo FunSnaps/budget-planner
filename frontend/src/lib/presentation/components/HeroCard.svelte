@@ -3,10 +3,10 @@
   import { fmt, annualFromMonthly } from '$lib/domain/planner';
   import { CATS } from '$lib/domain/planner';
   import { totals } from '$lib/application/stores/budgetStore';
+  import MoneyInput from './MoneyInput.svelte';
 
-  function onTakeHomeInput(e: Event) {
-    const val = parseFloat((e.target as HTMLInputElement).value) || 0;
-    state.update((s) => ({ ...s, takeHome: val }));
+  function onTakeHome(e: CustomEvent<number>) {
+    state.update((s) => ({ ...s, takeHome: e.detail }));
   }
 
   function onRoleLabelInput(e: Event) {
@@ -29,19 +29,16 @@
   <div class="hero-row">
     <div class="hero-input-wrap">
       <span class="cur">£</span>
-      <input
-        class="hero-take-home"
-        type="number"
-        min="0"
-        step="1"
-        value={$state.takeHome || ''}
-        on:input={onTakeHomeInput}
-        placeholder="0"
+      <MoneyInput
+        inputClass="hero-take-home"
+        ariaLabel="Monthly take-home"
+        value={$state.takeHome}
+        on:change={onTakeHome}
       />
     </div>
-    {#if $state.annualSalary}
+    {#if $state.takeHome > 0}
       <span class="hero-annual">
-        est. <strong>{fmt(annualFromMonthly($state.takeHome))}</strong> / yr
+        <strong>{fmt(annualFromMonthly($state.takeHome))}</strong> / yr
       </span>
     {/if}
   </div>
@@ -51,9 +48,10 @@
       <div class="hero-split-cell">
         <div class="k">
           <span class="dot" style="background:{cat.color}"></span>
-          {cat.label}
+          {cat.label} · {Math.round(cat.target * 100)}%
         </div>
-        <div class="v num">{fmt($totals[cat.key])}</div>
+        <div class="v num">{fmt($state.takeHome * cat.target)}</div>
+        <div class="planned">{fmt($totals[cat.key])} planned</div>
       </div>
     {/each}
   </div>

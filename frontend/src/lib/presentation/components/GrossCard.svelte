@@ -1,15 +1,14 @@
 <script lang="ts">
   import { state } from '$lib/application/stores/budgetStore';
   import { fmt, estimateTakeHome, monthlyFromAnnual } from '$lib/domain/planner';
+  import MoneyInput from './MoneyInput.svelte';
 
-  function onSalaryInput(e: Event) {
-    const val = parseFloat((e.target as HTMLInputElement).value) || 0;
-    state.update((s) => ({ ...s, annualSalary: val }));
+  function onSalary(e: CustomEvent<number>) {
+    state.update((s) => ({ ...s, annualSalary: e.detail }));
   }
 
-  function onBonusInput(e: Event) {
-    const val = parseFloat((e.target as HTMLInputElement).value) || 0;
-    state.update((s) => ({ ...s, annualBonus: val }));
+  function onBonus(e: CustomEvent<number>) {
+    state.update((s) => ({ ...s, annualBonus: e.detail }));
   }
 
   function fillFromSalary() {
@@ -45,15 +44,8 @@
           <div class="stat-label">Annual gross</div>
           <div class="stat-value-input">
             <span class="cur">£</span>
-            <input
-              class="stat-input"
-              type="number"
-              min="0"
-              step="1000"
-              value={$state.annualSalary || ''}
-              on:input={onSalaryInput}
-              placeholder="0"
-            />
+            <MoneyInput inputClass="stat-input" ariaLabel="Annual gross salary"
+              value={$state.annualSalary} on:change={onSalary} />
           </div>
         </div>
         <div class="stat-cell">
@@ -81,15 +73,8 @@
           <div class="stat-label">Gross bonus</div>
           <div class="stat-value-input">
             <span class="cur">£</span>
-            <input
-              class="stat-input"
-              type="number"
-              min="0"
-              step="500"
-              value={$state.annualBonus || ''}
-              on:input={onBonusInput}
-              placeholder="0"
-            />
+            <MoneyInput inputClass="stat-input" ariaLabel="Gross bonus"
+              value={$state.annualBonus} on:change={onBonus} />
           </div>
         </div>
       </div>

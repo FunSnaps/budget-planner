@@ -18,7 +18,7 @@ test.describe('Planner', () => {
     const input = page.locator('.hero-take-home');
     await input.fill('3000');
     await input.dispatchEvent('input');
-    await expect(input).toHaveValue('3000');
+    await expect(input).toHaveValue('3,000');
   });
 
   test('adding a needs item updates the register subtotal', async ({ page }) => {

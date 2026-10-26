@@ -7,6 +7,7 @@
     addBill, removeBill, updateBill, resetSplit,
   } from '$lib/application/stores/splitStore';
   import { fmt, estimateTakeHome, monthlyFromAnnual } from '$lib/domain/planner';
+  import MoneyInput from '$lib/presentation/components/MoneyInput.svelte';
 
   const COLORS = ['#0088a0', '#c98a00', '#0ca30c', '#8a4fd3', '#d33f6a', '#4f6bd3'];
 
@@ -73,22 +74,20 @@
             class="name-input" type="text" maxlength="40" placeholder="Name"
             value={p.name} on:input={(e) => updatePerson(p.id, { name: str(e) })}
           />
-          <label class="money" class:dim={$split.basis !== 'gross'}>
+          <div class="money" class:dim={$split.basis !== 'gross'}>
             <span class="lbl">Gross / yr</span>
             <span class="field"><span class="cur">£</span>
-              <input class="mini-input" type="number" min="0" step="100"
-                value={p.gross || ''} placeholder="0"
-                on:input={(e) => updatePerson(p.id, { gross: num(e) })} />
+              <MoneyInput inputClass="mini-input" ariaLabel="Gross salary per year"
+                value={p.gross} on:change={(e) => updatePerson(p.id, { gross: e.detail })} />
             </span>
-          </label>
-          <label class="money" class:dim={$split.basis !== 'takeHome'}>
+          </div>
+          <div class="money" class:dim={$split.basis !== 'takeHome'}>
             <span class="lbl">Take-home / mo</span>
             <span class="field"><span class="cur">£</span>
-              <input class="mini-input" type="number" min="0" step="10"
-                value={p.takeHome || ''} placeholder="0"
-                on:input={(e) => updatePerson(p.id, { takeHome: num(e) })} />
+              <MoneyInput inputClass="mini-input" ariaLabel="Take-home per month"
+                value={p.takeHome} on:change={(e) => updatePerson(p.id, { takeHome: e.detail })} />
             </span>
-          </label>
+          </div>
           <button
             class="ghost-btn tiny" type="button"
             disabled={!p.gross} title="Estimate monthly take-home from gross (UK 2024/25)"
