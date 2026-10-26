@@ -60,6 +60,7 @@
     <h1>Your budget</h1>
     {#if data.user}
       <p class="sub">
+        <a href="/split" style="color:var(--accent);text-decoration:none">Split shared bills →</a> ·
         {data.user.email} ·
         <button
           class="ghost-btn"
