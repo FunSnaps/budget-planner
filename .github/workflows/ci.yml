@@ -8,7 +8,7 @@ on:
 
 jobs:
   api:
-    name: API: lint, type-check, test
+    name: API lint, type-check and test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,7 +26,7 @@ jobs:
       - run: pytest tests/unit tests/integration -v
 
   frontend:
-    name: Frontend: lint, type-check, test, build
+    name: Frontend lint, type-check, test and build
     runs-on: ubuntu-latest
     defaults:
       run:
