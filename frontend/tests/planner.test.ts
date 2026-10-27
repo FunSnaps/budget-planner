@@ -22,17 +22,11 @@ test.describe('Planner', () => {
   });
 
   test('adding a needs item updates the register subtotal', async ({ page }) => {
-    // Open needs register and add a row
-    await page.locator('.register-head').first().click();
-    await page.locator('.add-row-btn').first().click();
+    // Needs come pre-filled; type an amount against the first one (Rent / mortgage)
+    await expect(page.locator('.row-label-input').first()).toHaveValue('Rent / mortgage');
+    await page.locator('.row-amt-input').first().fill('800');
 
-    const labelInput = page.locator('.row-label-input').last();
-    const amtInput = page.locator('.row-amt-input').last();
-    await labelInput.fill('Rent');
-    await amtInput.fill('800');
-    await amtInput.dispatchEvent('input');
-
-    await expect(page.locator('.register-head .subtotal').first()).toContainText('800');
+    await expect(page.locator('.group-head .subtotal').first()).toContainText('800');
   });
 
   test('auto-save fires after entering data', async ({ page }) => {

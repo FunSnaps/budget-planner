@@ -4,9 +4,25 @@
   import { CATS } from '$lib/domain/planner';
   import { totals } from '$lib/application/stores/budgetStore';
   import MoneyInput from './MoneyInput.svelte';
+  import { estimateTakeHome, monthlyFromAnnual } from '$lib/domain/planner';
 
   function onTakeHome(e: CustomEvent<number>) {
     state.update((s) => ({ ...s, takeHome: e.detail }));
+  }
+
+  function onSalary(e: CustomEvent<number>) {
+    state.update((s) => ({ ...s, annualSalary: e.detail }));
+  }
+
+  function onBonus(e: CustomEvent<number>) {
+    state.update((s) => ({ ...s, annualBonus: e.detail }));
+  }
+
+  function useEstimate() {
+    state.update((s) => ({
+      ...s,
+      takeHome: Math.round(monthlyFromAnnual(estimateTakeHome(s.annualSalary))),
+    }));
   }
 
   function onRoleLabelInput(e: Event) {
@@ -41,6 +57,38 @@
         <strong>{fmt(annualFromMonthly($state.takeHome))}</strong> / yr
       </span>
     {/if}
+  </div>
+
+  <div class="hero-extra">
+    <div>
+      <div class="hero-extra-label">Annual salary (gross)</div>
+      <div class="hero-extra-field">
+        <span class="cur">£</span>
+        <MoneyInput
+          inputClass="hero-extra-input"
+          ariaLabel="Annual salary"
+          value={$state.annualSalary}
+          on:change={onSalary}
+        />
+      </div>
+      {#if $state.annualSalary > 0}
+        <button class="link-btn" type="button" on:click={useEstimate}>
+          Use estimated take-home: {fmt(monthlyFromAnnual(estimateTakeHome($state.annualSalary)))} / mo
+        </button>
+      {/if}
+    </div>
+    <div>
+      <div class="hero-extra-label">Annual bonus (gross, optional)</div>
+      <div class="hero-extra-field">
+        <span class="cur">£</span>
+        <MoneyInput
+          inputClass="hero-extra-input"
+          ariaLabel="Annual bonus"
+          value={$state.annualBonus}
+          on:change={onBonus}
+        />
+      </div>
+    </div>
   </div>
 
   <div class="hero-split">

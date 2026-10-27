@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import type { Budget, BudgetState } from '$lib/domain/entities/Budget';
-import { EMPTY_STATE } from '$lib/domain/entities/Budget';
+import { EMPTY_STATE, withDefaultSpending } from '$lib/domain/entities/Budget';
 import { CATS, sum, statusFor, pct } from '$lib/domain/planner';
 
 export const state = writable<BudgetState>(EMPTY_STATE);
@@ -37,6 +37,6 @@ export const compositionSegments = derived([state, totals], ([$s, $t]) => {
 });
 
 export function initStores(budget: Budget, savedBudgets: Budget[]): void {
-  state.set(budget.state);
+  state.set(withDefaultSpending(budget.state));
   saves.set(savedBudgets);
 }

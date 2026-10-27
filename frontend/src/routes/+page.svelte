@@ -5,12 +5,10 @@
   import { autoSaveBudget, cancelAutoSave } from '$lib/application/use-cases/autoSaveBudget';
   import { migrateLegacyData } from '$lib/application/use-cases/migrateLegacyData';
   import { BudgetApiService } from '$lib/infrastructure/api/BudgetApiService';
-  import { CATS } from '$lib/domain/planner';
 
   import HeroCard from '$lib/presentation/components/HeroCard.svelte';
-  import GrossCard from '$lib/presentation/components/GrossCard.svelte';
   import Gauges from '$lib/presentation/components/Gauges.svelte';
-  import RegisterTable from '$lib/presentation/components/RegisterTable.svelte';
+  import SpendingRegister from '$lib/presentation/components/SpendingRegister.svelte';
   import CompositionBar from '$lib/presentation/components/CompositionBar.svelte';
   import FlagBanner from '$lib/presentation/components/FlagBanner.svelte';
   import BonusTracker from '$lib/presentation/components/BonusTracker.svelte';
@@ -77,17 +75,12 @@
   </header>
 
   <HeroCard />
-  <GrossCard />
 
   <Gauges />
   <CompositionBar />
   <FlagBanner />
 
-  <div class="registers">
-    {#each CATS as cat}
-      <RegisterTable {cat} />
-    {/each}
-  </div>
+  <SpendingRegister />
 
   <OneOffCard />
   <BonusTracker />
