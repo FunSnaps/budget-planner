@@ -11,10 +11,12 @@ export interface CoupleState {
   customTotal: number | null;
   /** Amounts typed into individual lines, keyed by costKey. They never change the budget. */
   amounts: Record<string, number>;
+  /** Lines taken out of the calculator, keyed by costKey. The budget keeps them. */
+  removed: string[];
 }
 
 const defaults = (): CoupleState => ({
-  partnerName: 'Partner', partnerIncome: 0, shared: {}, customTotal: null, amounts: {},
+  partnerName: 'Partner', partnerIncome: 0, shared: {}, customTotal: null, amounts: {}, removed: [],
 });
 
 const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object';
@@ -37,6 +39,7 @@ export function loadCouple(): void {
             Object.entries(p.amounts).filter(([, v]) => typeof v === 'number' && v >= 0)
           ) as Record<string, number>
         : {},
+      removed: Array.isArray(p.removed) ? p.removed.filter((k): k is string => typeof k === 'string') : [],
     });
   } catch {
     /* storage unavailable or corrupt, keep defaults */
@@ -69,6 +72,15 @@ export function setCustomTotal(total: number | null) {
 
 export function setLineAmount(key: string, amount: number) {
   couple.update((c) => ({ ...c, amounts: { ...c.amounts, [key]: amount } }));
+}
+
+export function removeLine(key: string) {
+  couple.update((c) => (c.removed.includes(key) ? c : { ...c, removed: [...c.removed, key] }));
+}
+
+/** Bring back every line that was removed. */
+export function restoreLines() {
+  couple.update((c) => ({ ...c, removed: [] }));
 }
 
 /** Forget every typed amount and go back to the budget's own figures. */

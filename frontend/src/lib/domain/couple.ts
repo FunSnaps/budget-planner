@@ -28,17 +28,20 @@ export function isShared(shared: Record<string, boolean>, cat: SharedCat, key: s
 /**
  * Every named budget line (or any line with an amount), flagged as shared or personal.
  * `amounts` holds figures typed into the calculator, which win over the budget's own
- * amount without changing the budget.
+ * amount without changing the budget. `removed` keys are left out of the calculator,
+ * though they stay in the budget.
  */
 export function sharedCosts(
   state: BudgetState,
   shared: Record<string, boolean>,
-  amounts: Record<string, number> = {}
+  amounts: Record<string, number> = {},
+  removed: string[] = []
 ): SharedCost[] {
   return SHARED_CATS.flatMap(({ key: cat }) =>
     state[cat].flatMap((item): SharedCost[] => {
       const label = item.label.trim() || 'Untitled';
       const key = costKey(cat, label);
+      if (removed.includes(key)) return [];
       const amount = amounts[key] ?? item.amount;
       if (!item.label.trim() && amount <= 0) return [];
       return [{ key, cat, label, amount, shared: isShared(shared, cat, key) }];

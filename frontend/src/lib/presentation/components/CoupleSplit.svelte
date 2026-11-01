@@ -3,7 +3,7 @@
   import { state } from '$lib/application/stores/budgetStore';
   import {
     couple, loadCouple, persistCouple, setPartnerName, setPartnerIncome, setShared, setCustomTotal,
-    setLineAmount, resetLineAmounts,
+    setLineAmount, resetLineAmounts, removeLine, restoreLines,
   } from '$lib/application/stores/coupleStore';
   import { SHARED_CATS, computeCouple, sharedCosts, sharedTotal } from '$lib/domain/couple';
   import { fmt } from '$lib/domain/planner';
@@ -20,7 +20,8 @@
   onDestroy(() => unsubscribe?.());
 
   $: partner = $couple.partnerName.trim() || 'Partner';
-  $: costs = sharedCosts($state, $couple.shared, $couple.amounts);
+  $: costs = sharedCosts($state, $couple.shared, $couple.amounts, $couple.removed);
+  $: removedCount = $couple.removed.length;
   $: hasTypedAmounts = Object.keys($couple.amounts).length > 0;
   $: custom = $couple.customTotal;
   $: lineTotal = sharedTotal(costs);
@@ -139,31 +140,44 @@
     </div>
   {/if}
 
-  {#if costs.length === 0}
+  {#if costs.length === 0 && removedCount === 0}
     {#if custom === null}
       <p class="saves-empty">Add amounts to your budget lines and they appear here to share.</p>
     {/if}
   {:else}
     <div class="list-head">
       <h4 class="list-title">Which costs are shared?</h4>
-      {#if hasTypedAmounts}
-        <button class="ghost-btn compact" type="button" on:click={resetLineAmounts}>
-          Reset amounts to budget
-        </button>
-      {/if}
+      <span class="list-actions">
+        {#if removedCount > 0}
+          <button class="ghost-btn compact" type="button" on:click={restoreLines}>
+            Restore removed ({removedCount})
+          </button>
+        {/if}
+        {#if hasTypedAmounts}
+          <button class="ghost-btn compact" type="button" on:click={resetLineAmounts}>
+            Reset amounts to budget
+          </button>
+        {/if}
+      </span>
     </div>
     {#if custom !== null}
       <p class="kv-note list-note">Your own total is in use, so the budget lines below are set aside.</p>
     {/if}
+    {#if costs.length === 0}
+      <p class="saves-empty">Every line is removed. Restore them to split by line.</p>
+    {:else}
     <table class="shares" class:muted={custom !== null}>
       <thead>
-        <tr><th class="chk"></th><th></th><th class="r">Total</th><th class="r">You</th><th class="r">{partner}</th></tr>
+        <tr>
+          <th class="chk"></th><th></th><th class="r">Total</th><th class="r">You</th><th class="r">{partner}</th>
+          <th class="del"></th>
+        </tr>
       </thead>
       {#each SHARED_CATS as cat}
         {@const group = rows.filter((c) => c.cat === cat.key)}
         {#if group.length}
           <tbody>
-            <tr class="group"><th colspan="5">{cat.label}</th></tr>
+            <tr class="group"><th colspan="6">{cat.label}</th></tr>
             {#each group as c (c.key)}
               <tr class:off={!c.shared}>
                 <td class="chk">
@@ -179,6 +193,11 @@
                 </td>
                 <td class="r num">{c.active ? fmt(c.you) : '·'}</td>
                 <td class="r num">{c.active ? fmt(c.them) : '·'}</td>
+                <td class="del">
+                  <button class="del-btn" type="button" aria-label="Remove {c.label} from the split"
+                    title="Remove from this calculator (your budget keeps it)"
+                    on:click={() => removeLine(c.key)}>×</button>
+                </td>
               </tr>
             {/each}
           </tbody>
@@ -190,13 +209,15 @@
           <td class="r num">{fmt(lineTotal)}</td>
           <td class="r num">{custom === null ? fmt(r.owed[0]) : '·'}</td>
           <td class="r num">{custom === null ? fmt(r.owed[1]) : '·'}</td>
+          <td></td>
         </tr>
       </tfoot>
     </table>
+    {/if}
   {/if}
 
   <p class="kv-note">
-    Type an amount on any line to see the split. This is a calculator, so your budget stays as it is.
+    Type an amount on any line to see the split, or remove a line with ×. This is a calculator, so your budget stays as it is.
     Needs are shared by default. Tick any other line to share it.
     For gross pay, more people, or bills paid from different accounts, use
     <a href="/split">Split bills</a>.
@@ -239,6 +260,7 @@
 
   .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 18px 0 4px; }
   .list-title { font-size: 13px; margin: 0; }
+  .list-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .list-note { margin: 0 0 4px; }
   .shares.muted { opacity: .55; }
   .shares { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -250,6 +272,7 @@
   .shares td { padding: 6px 6px; border-bottom: 1px solid var(--line); }
   .shares .r { text-align: right; }
   .shares .chk { width: 26px; padding-left: 0; }
+  .shares .del { width: 24px; padding-right: 0; text-align: right; }
   .shares .amt { width: 120px; padding-top: 3px; padding-bottom: 3px; }
   .shares .amt :global(.row-amt-input) { width: 100%; }
   .shares .lbl { max-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

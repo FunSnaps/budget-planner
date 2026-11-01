@@ -74,6 +74,19 @@ describe('sharedCosts', () => {
     expect(JSON.stringify(state)).toBe(before);
   });
 
+  it('leaves removed lines out of the calculator but not out of the budget', () => {
+    const before = JSON.stringify(state);
+    const costs = sharedCosts(state, {}, {}, ['needs:Rent']);
+    expect(costs.map((c) => c.label)).toEqual(['Water', 'Eating out', 'Untitled']);
+    expect(sharedTotal(costs)).toBe(0);
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it('drops a removed line from the split total', () => {
+    const costs = sharedCosts(state, {}, { 'needs:Water': 100 }, ['needs:Rent']);
+    expect(computeCouple(3000, 2000, costs).total).toBe(100);
+  });
+
   it('feeds typed amounts straight into the split', () => {
     const costs = sharedCosts(state, {}, { 'needs:Water': 100 });
     expect(computeCouple(3000, 2000, costs).total).toBe(1000);
