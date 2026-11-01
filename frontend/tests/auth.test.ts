@@ -11,7 +11,7 @@ test.describe('Auth flows', () => {
     await page.fill('[name=password]', PASSWORD);
     await page.click('button[type=submit]');
     await expect(page).toHaveURL('/');
-    await expect(page.locator('h1')).toContainText('budget');
+    await expect(page.locator('.income-take-home')).toBeVisible();
   });
 
   test('logout → redirected to login', async ({ page }) => {

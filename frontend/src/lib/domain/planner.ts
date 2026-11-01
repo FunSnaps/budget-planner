@@ -15,8 +15,6 @@ export const CATS: Cat[] = [
   { key: 'savings', label: 'Savings', target: 0.2,  color: '#0ca30c' },
 ];
 
-export const CAT_KEYS = CATS.map((c) => c.key);
-
 export function sum(items: BudgetStateItem[]): number {
   return items.reduce((acc, it) => acc + (it.amount || 0), 0);
 }
@@ -45,10 +43,6 @@ export function statusFor(actual: number, target: number, takeHome: number): Gau
   if (diff <= 0.05) return 'good';
   if (diff <= 0.1) return 'warning';
   return 'critical';
-}
-
-export function annualFromMonthly(monthly: number): number {
-  return round2(monthly * 12);
 }
 
 export function monthlyFromAnnual(annual: number): number {

@@ -45,6 +45,7 @@ test.describe('Planner', () => {
 
   test('saved budget appears in list', async ({ page }) => {
     const saveName = `snapshot-${UNIQUE}`;
+    await page.locator('#tab-saves').click();
     await page.locator('.save-name-input').fill(saveName);
     await page.locator('button:has-text("Save snapshot")').click();
 

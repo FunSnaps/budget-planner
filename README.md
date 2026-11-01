@@ -4,7 +4,7 @@ A full-stack budget planner built around the 50/30/20 rule (needs / wants / savi
 
 ## Features
 
-- **Budget planner**: enter monthly take-home, log line items under Needs, Wants and Savings, and see gauges against the 50/30/20 targets.
+- **Budget planner**: a single-screen dashboard. Enter monthly take-home, fill in pre-populated line items under Needs, Wants and Savings, and see each category against its 50/30/20 target.
 - **Bonus and one-off costs**: log windfalls and split them across categories; track annual costs as a monthly set-aside.
 - **Saved budgets**: snapshot, reload and delete named budgets. The active budget auto-saves.
 - **Share links**: read-only link to a saved budget, no login needed.

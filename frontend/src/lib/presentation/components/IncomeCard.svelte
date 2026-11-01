@@ -1,6 +1,5 @@
 <script lang="ts">
   import { state } from '$lib/application/stores/budgetStore';
-  import { fmt, annualFromMonthly } from '$lib/domain/planner';
   import MoneyInput from './MoneyInput.svelte';
 
   function onTakeHome(e: CustomEvent<number>) {
@@ -39,14 +38,6 @@
       on:change={onTakeHome}
     />
   </div>
-  <p class="income-annual">
-    {#if $state.takeHome > 0}
-      <strong class="num">{fmt(annualFromMonthly($state.takeHome))}</strong> a year after tax
-    {:else}
-      Type your pay after tax to get started
-    {/if}
-  </p>
-
   <div class="income-extra">
     <div class="income-field">
       <span class="income-label">Annual bonus (optional)</span>
