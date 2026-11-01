@@ -1,14 +1,10 @@
 <script lang="ts">
   import { state } from '$lib/application/stores/budgetStore';
-  import { fmt, annualFromMonthly, estimateTakeHome, monthlyFromAnnual } from '$lib/domain/planner';
+  import { fmt, annualFromMonthly } from '$lib/domain/planner';
   import MoneyInput from './MoneyInput.svelte';
 
   function onTakeHome(e: CustomEvent<number>) {
     state.update((s) => ({ ...s, takeHome: e.detail }));
-  }
-
-  function onSalary(e: CustomEvent<number>) {
-    state.update((s) => ({ ...s, annualSalary: e.detail }));
   }
 
   function onBonus(e: CustomEvent<number>) {
@@ -18,13 +14,6 @@
   function onRoleLabel(e: Event) {
     const roleLabel = (e.target as HTMLInputElement).value.slice(0, 80);
     state.update((s) => ({ ...s, roleLabel }));
-  }
-
-  function useEstimate() {
-    state.update((s) => ({
-      ...s,
-      takeHome: Math.round(monthlyFromAnnual(estimateTakeHome(s.annualSalary))),
-    }));
   }
 </script>
 
@@ -60,24 +49,11 @@
 
   <div class="income-extra">
     <div class="income-field">
-      <span class="income-label">Annual salary</span>
-      <span class="income-box">
-        <span class="cur">£</span>
-        <MoneyInput inputClass="income-input" ariaLabel="Annual salary (gross)" value={$state.annualSalary} on:change={onSalary} />
-      </span>
-    </div>
-    <div class="income-field">
-      <span class="income-label">Annual bonus</span>
+      <span class="income-label">Annual bonus (optional)</span>
       <span class="income-box">
         <span class="cur">£</span>
         <MoneyInput inputClass="income-input" ariaLabel="Annual bonus (gross)" value={$state.annualBonus} on:change={onBonus} />
       </span>
     </div>
   </div>
-
-  {#if $state.annualSalary > 0}
-    <button class="link-btn" type="button" on:click={useEstimate}>
-      Use estimated take-home: {fmt(monthlyFromAnnual(estimateTakeHome($state.annualSalary)))} / mo
-    </button>
-  {/if}
 </section>

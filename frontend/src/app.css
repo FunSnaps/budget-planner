@@ -70,8 +70,6 @@ h1,h2,h3{ font-family:"IBM Plex Serif",Georgia,serif; margin:0; text-wrap:balanc
 .hero-split-cell .k{ display:flex; align-items:center; gap:7px; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); font-weight:600; margin-bottom:6px; }
 .hero-split-cell .dot{ width:8px; height:8px; border-radius:2px; flex:none; }
 .hero-split-cell .v{ font-family:"IBM Plex Mono",monospace; font-size:18px; font-weight:600; }
-.link-btn{ background:none; border:none; padding:5px 0 0; color:var(--accent); font-size:11.5px; cursor:pointer; font-family:"IBM Plex Sans",sans-serif; text-align:left; }
-.link-btn:hover{ text-decoration:underline; }
 @media (max-width:640px){ .hero-extra{ grid-template-columns:1fr; } }
 @media (max-width:640px){ .hero-split{ flex-direction:column; } .hero-split-cell{ border-right:none; border-bottom:1px solid var(--line); } .hero-split-cell:last-child{ border-bottom:none; } }
 
@@ -267,7 +265,7 @@ table.mini-ledger td.del-col{ width:22px; text-align:right; padding-left:4px; }
 .income-take-home:focus{ outline:none; border-bottom-color:var(--accent-3); }
 .income-annual{ font-size:12.5px; color:var(--ink-faint); margin:8px 0 0; }
 .income-annual strong{ color:var(--ink-soft); }
-.income-extra{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+.income-extra{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
 .income-label{ display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); font-weight:600; margin-bottom:4px; }
 .income-box{ display:flex; align-items:baseline; gap:3px; border-bottom:1.5px solid var(--line-strong); }
 .income-box:focus-within{ border-bottom-color:var(--accent); }
