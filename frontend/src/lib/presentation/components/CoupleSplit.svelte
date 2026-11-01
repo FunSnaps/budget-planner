@@ -164,7 +164,7 @@
   .inc-edit:focus-within { border-bottom-color: var(--accent); }
   .inc-box .cur { color: var(--ink-faint); font-size: 14px; }
   .inc-fixed { font-size: 17px; font-weight: 600; color: var(--ink); }
-  .inc-box :global(.mini-input) { flex: 1; min-width: 0; width: 100%; border-bottom: none; font-size: 17px; font-weight: 600; }
+  .inc-box :global(.mini-input) { flex: 0 1 110px; min-width: 0; width: 110px; text-align: left; border-bottom: none; font-size: 17px; font-weight: 600; }
   .inc-hint { color: var(--ink-faint); font-size: 11.5px; white-space: nowrap; }
   .partner-name {
     min-width: 0; width: 100%; background: transparent; border: none; border-bottom: 1px solid transparent;

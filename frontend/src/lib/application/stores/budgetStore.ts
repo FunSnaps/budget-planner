@@ -38,5 +38,8 @@ export const compositionSegments = derived([state, totals], ([$s, $t]) => {
 
 export function initStores(budget: RawBudget, savedBudgets: RawBudget[]): void {
   state.set(withDefaultSpending(budget.state));
-  saves.set(savedBudgets.map(normaliseBudget));
+  // Newest first by creation, so renaming a snapshot never moves it in the list
+  saves.set(
+    savedBudgets.map(normaliseBudget).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  );
 }
