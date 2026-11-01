@@ -4,10 +4,11 @@
     split, result, MAX_PEOPLE,
     loadSplit, persistSplit, setBasis,
     addPerson, removePerson, updatePerson,
-    addBill, removeBill, updateBill, resetSplit,
+    addBill, removeBill, updateBill, sortBills, resetSplit,
   } from '$lib/application/stores/splitStore';
   import { fmt, estimateTakeHome, monthlyFromAnnual } from '$lib/domain/planner';
   import MoneyInput from '$lib/presentation/components/MoneyInput.svelte';
+  import SortToggle from '$lib/presentation/components/SortToggle.svelte';
   import AppHeader from '$lib/presentation/components/AppHeader.svelte';
 
   const COLORS = ['#0088a0', '#c98a00', '#0ca30c', '#8a4fd3', '#d33f6a', '#4f6bd3'];
@@ -153,9 +154,12 @@
         {/each}
       </tbody>
     </table>
-    <button class="mini-add-btn" type="button" on:click={addBill}>
-      <span class="plus">+</span> Add bill
-    </button>
+    <div class="list-bar">
+      <button class="mini-add-btn" type="button" on:click={addBill}>
+        <span class="plus">+</span> Add bill
+      </button>
+      <SortToggle count={$split.bills.length} on:sort={(e) => sortBills(e.detail)} />
+    </div>
 
     <div class="card-subtotal" style="margin-top:12px">
       <span>Total per month</span>

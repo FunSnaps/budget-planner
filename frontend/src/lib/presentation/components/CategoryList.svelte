@@ -1,8 +1,10 @@
 <script lang="ts">
   import { state } from '$lib/application/stores/budgetStore';
-  import type { Cat } from '$lib/domain/planner';
+  import { sortByAmount } from '$lib/domain/planner';
+  import type { Cat, SortDir } from '$lib/domain/planner';
   import type { BudgetState, BudgetStateItem } from '$lib/domain/entities/Budget';
   import MoneyInput from './MoneyInput.svelte';
+  import SortToggle from './SortToggle.svelte';
 
   export let cat: Cat;
 
@@ -16,6 +18,10 @@
 
   function removeRow(index: number) {
     updateItems((items) => items.filter((_, i) => i !== index));
+  }
+
+  function sortRows(dir: SortDir) {
+    updateItems((items) => sortByAmount(items, dir));
   }
 
   function setLabel(index: number, e: Event) {
@@ -65,6 +71,9 @@
     {/each}
   </tbody>
 </table>
-<button class="add-row-btn" type="button" on:click={addRow}>
-  <span class="plus">+</span> Add {cat.label.toLowerCase()} item
-</button>
+<div class="list-bar ledger-bar">
+  <button class="add-row-btn" type="button" on:click={addRow}>
+    <span class="plus">+</span> Add {cat.label.toLowerCase()} item
+  </button>
+  <SortToggle count={$state[cat.key].length} on:sort={(e) => sortRows(e.detail)} />
+</div>

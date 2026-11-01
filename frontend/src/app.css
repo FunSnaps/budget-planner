@@ -139,6 +139,10 @@ table.mini-ledger td.amt-col{ text-align:right; width:120px; }
 table.mini-ledger td.del-col{ width:22px; text-align:right; padding-left:4px; }
 .mini-add-btn{ display:flex; align-items:center; gap:6px; width:100%; text-align:left; padding:9px 0 2px; background:none; border:none; color:var(--ink-soft); font-size:12px; font-weight:600; cursor:pointer; font-family:"IBM Plex Sans",sans-serif; }
 .mini-add-btn:hover{ color:var(--accent); }
+.list-bar{ display:flex; align-items:center; gap:10px; }
+.list-bar .add-row-btn, .list-bar .mini-add-btn{ flex:1; width:auto; }
+.list-bar.ledger-bar{ background:var(--surface-2); border-top:1px solid var(--line); padding-right:18px; }
+.list-bar.ledger-bar .add-row-btn{ border-top:none; }
 .mini-add-btn .plus{ font-family:"IBM Plex Mono",monospace; font-size:13px; }
 .bonus-apply-bar{ display:flex; align-items:flex-end; gap:18px; flex-wrap:wrap; border-top:1px dashed var(--line-strong); margin-top:14px; padding-top:16px; }
 .apply-field{ display:flex; flex-direction:column; gap:5px; }
@@ -158,7 +162,6 @@ table.mini-ledger td.del-col{ width:22px; text-align:right; padding-left:4px; }
 .save-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
 .save-name-input{ flex:1 1 220px; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:9px 12px; font-size:13.5px; color:var(--ink); font-family:"IBM Plex Sans",sans-serif; }
 .save-name-input:focus{ outline:none; border-color:var(--accent); }
-.save-name-input.is-flagged{ border-color:var(--critical); }
 .saves-list{ display:flex; flex-direction:column; gap:8px; }
 .saves-empty{ font-size:12.5px; color:var(--ink-faint); font-style:italic; padding:2px 0; }
 .save-item{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; border:1px solid var(--line); border-radius:5px; padding:10px 14px; background:var(--surface-2); }

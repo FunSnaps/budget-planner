@@ -1,5 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import { computeSplit } from '$lib/domain/split';
+import { sortByAmount } from '$lib/domain/planner';
+import type { SortDir } from '$lib/domain/planner';
 import type { Bill, Person, SplitBasis, SplitState } from '$lib/domain/entities/Split';
 
 const STORAGE_KEY = 'planner.split.v1';
@@ -92,6 +94,10 @@ export function addBill() {
 
 export function removeBill(id: string) {
   split.update((s) => ({ ...s, bills: s.bills.filter((b) => b.id !== id) }));
+}
+
+export function sortBills(dir: SortDir) {
+  split.update((s) => ({ ...s, bills: sortByAmount(s.bills, dir) }));
 }
 
 export function updateBill(id: string, patch: Partial<Omit<Bill, 'id'>>) {

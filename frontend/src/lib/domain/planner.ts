@@ -19,6 +19,14 @@ export function sum(items: BudgetStateItem[]): number {
   return items.reduce((acc, it) => acc + (it.amount || 0), 0);
 }
 
+export type SortDir = 'asc' | 'desc';
+
+/** A copy of `items` ordered by amount. Equal amounts keep their current order. */
+export function sortByAmount<T extends { amount: number }>(items: T[], dir: SortDir): T[] {
+  const sign = dir === 'asc' ? 1 : -1;
+  return [...items].sort((a, b) => sign * ((a.amount || 0) - (b.amount || 0)));
+}
+
 export function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }

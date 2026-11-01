@@ -24,6 +24,25 @@ export interface Budget {
   updatedAt: string;
 }
 
+/** A budget as it comes off the wire: the API sends snake_case timestamps and no user id. */
+export type RawBudget = Omit<Budget, 'userId' | 'createdAt' | 'updatedAt'> &
+  Partial<Pick<Budget, 'userId' | 'createdAt' | 'updatedAt'>> & {
+    created_at?: string;
+    updated_at?: string;
+  };
+
+/** Map an API budget onto the frontend shape, accepting either timestamp spelling. */
+export function normaliseBudget(raw: RawBudget): Budget {
+  const { created_at, updated_at, ...rest } = raw;
+  const createdAt = raw.createdAt ?? created_at ?? '';
+  return {
+    ...rest,
+    userId: raw.userId ?? '',
+    createdAt,
+    updatedAt: raw.updatedAt ?? updated_at ?? createdAt,
+  };
+}
+
 const named = (labels: string[]): BudgetStateItem[] =>
   labels.map((label) => ({ label, amount: 0 }));
 

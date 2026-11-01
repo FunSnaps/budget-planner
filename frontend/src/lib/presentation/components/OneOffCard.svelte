@@ -1,8 +1,10 @@
 <script lang="ts">
   import { state, totals } from '$lib/application/stores/budgetStore';
-  import { fmt } from '$lib/domain/planner';
+  import { fmt, sortByAmount } from '$lib/domain/planner';
+  import type { SortDir } from '$lib/domain/planner';
   import type { BudgetState } from '$lib/domain/entities/Budget';
   import MoneyInput from './MoneyInput.svelte';
+  import SortToggle from './SortToggle.svelte';
 
   $: items = $state.oneOff;
   $: subtotal = $totals.oneOff;
@@ -12,6 +14,10 @@
       ...s,
       oneOff: [...s.oneOff, { label: '', amount: 0 }],
     }));
+  }
+
+  function sortItems(dir: SortDir) {
+    state.update((s) => ({ ...s, oneOff: sortByAmount(s.oneOff, dir) }));
   }
 
   function removeItem(i: number) {
@@ -67,9 +73,12 @@
       {/each}
     </tbody>
   </table>
-  <button class="mini-add-btn" type="button" on:click={addItem}>
-    <span class="plus">+</span> Add item
-  </button>
+  <div class="list-bar">
+    <button class="mini-add-btn" type="button" on:click={addItem}>
+      <span class="plus">+</span> Add item
+    </button>
+    <SortToggle count={items.length} on:sort={(e) => sortItems(e.detail)} />
+  </div>
 
   {#if subtotal > 0}
     <p class="kv-note">

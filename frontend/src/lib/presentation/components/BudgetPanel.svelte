@@ -6,6 +6,7 @@
   import CategoryList from './CategoryList.svelte';
   import OneOffCard from './OneOffCard.svelte';
   import BonusTracker from './BonusTracker.svelte';
+  import CoupleSplit from './CoupleSplit.svelte';
   import SavedBudgets from './SavedBudgets.svelte';
 
   export let service: IBudgetService;
@@ -22,6 +23,7 @@
     })),
     { id: 'oneOff', label: 'One-offs', meta: $totals.oneOff > 0 ? fmtWhole($totals.oneOff) : '', group: 'extras' },
     { id: 'bonus', label: 'Bonus', meta: $totals.bonus > 0 ? fmtWhole($totals.bonus) : '', group: 'extras' },
+    { id: 'couple', label: 'Couple split', meta: '', group: 'extras' },
     { id: 'saves', label: 'Snapshots', meta: $saves.length ? String($saves.length) : '', group: 'extras' },
   ];
 
@@ -41,6 +43,8 @@
       <OneOffCard />
     {:else if active === 'bonus'}
       <BonusTracker />
+    {:else if active === 'couple'}
+      <CoupleSplit />
     {:else}
       <SavedBudgets {service} />
     {/if}

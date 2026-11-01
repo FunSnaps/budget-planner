@@ -1,27 +1,28 @@
 import { http } from './http';
 import type { IBudgetService } from '$lib/domain/ports/IBudgetService';
-import type { Budget, BudgetState } from '$lib/domain/entities/Budget';
+import { normaliseBudget } from '$lib/domain/entities/Budget';
+import type { Budget, BudgetState, RawBudget } from '$lib/domain/entities/Budget';
 import type { Permission, Share } from '$lib/domain/entities/Share';
 
 export class BudgetApiService implements IBudgetService {
   async getActive(): Promise<Budget> {
-    return http.get<Budget>('/api/budget/active');
+    return normaliseBudget(await http.get<RawBudget>('/api/budget/active'));
   }
 
   async putActive(state: BudgetState): Promise<Budget> {
-    return http.put<Budget>('/api/budget/active', { state });
+    return normaliseBudget(await http.put<RawBudget>('/api/budget/active', { state }));
   }
 
   async listSaves(): Promise<Budget[]> {
-    return http.get<Budget[]>('/api/budget/saves');
+    return (await http.get<RawBudget[]>('/api/budget/saves')).map(normaliseBudget);
   }
 
   async createSave(name: string, state: BudgetState): Promise<Budget> {
-    return http.post<Budget>('/api/budget/saves', { name, state });
+    return normaliseBudget(await http.post<RawBudget>('/api/budget/saves', { name, state }));
   }
 
   async updateSave(id: string, data: { name?: string; state?: BudgetState }): Promise<Budget> {
-    return http.patch<Budget>(`/api/budget/saves/${id}`, data);
+    return normaliseBudget(await http.patch<RawBudget>(`/api/budget/saves/${id}`, data));
   }
 
   async deleteSave(id: string): Promise<void> {
