@@ -25,16 +25,24 @@ export function isShared(shared: Record<string, boolean>, cat: SharedCat, key: s
   return shared[key] ?? cat === 'needs';
 }
 
-/** Every budget line with an amount, flagged as shared or personal. */
-export function sharedCosts(state: BudgetState, shared: Record<string, boolean>): SharedCost[] {
+/**
+ * Every named budget line (or any line with an amount), flagged as shared or personal.
+ * `amounts` holds figures typed into the calculator, which win over the budget's own
+ * amount without changing the budget.
+ */
+export function sharedCosts(
+  state: BudgetState,
+  shared: Record<string, boolean>,
+  amounts: Record<string, number> = {}
+): SharedCost[] {
   return SHARED_CATS.flatMap(({ key: cat }) =>
-    state[cat]
-      .filter((item) => item.amount > 0)
-      .map((item) => {
-        const label = item.label.trim() || 'Untitled';
-        const key = costKey(cat, label);
-        return { key, cat, label, amount: item.amount, shared: isShared(shared, cat, key) };
-      })
+    state[cat].flatMap((item): SharedCost[] => {
+      const label = item.label.trim() || 'Untitled';
+      const key = costKey(cat, label);
+      const amount = amounts[key] ?? item.amount;
+      if (!item.label.trim() && amount <= 0) return [];
+      return [{ key, cat, label, amount, shared: isShared(shared, cat, key) }];
+    })
   );
 }
 

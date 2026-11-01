@@ -52,16 +52,30 @@ describe('sharedCosts', () => {
     savings: [{ label: '', amount: 50 }],
   };
 
-  it('lists only lines that have an amount', () => {
-    expect(sharedCosts(state, {}).map((c) => c.label)).toEqual(['Rent', 'Eating out', 'Untitled']);
+  it('lists named lines even at zero, and unnamed lines only with an amount', () => {
+    const withBlankZero = { ...state, wants: [...state.wants, { label: '', amount: 0 }] };
+    expect(sharedCosts(withBlankZero, {}).map((c) => c.label)).toEqual(['Rent', 'Water', 'Eating out', 'Untitled']);
   });
 
   it('shares needs by default and leaves wants and savings personal', () => {
-    expect(sharedCosts(state, {}).map((c) => c.shared)).toEqual([true, false, false]);
+    expect(sharedCosts(state, {}).map((c) => c.shared)).toEqual([true, true, false, false]);
   });
 
   it('respects the user toggles over the defaults', () => {
     const costs = sharedCosts(state, { 'needs:Rent': false, 'wants:Eating out': true });
-    expect(costs.map((c) => c.shared)).toEqual([false, true, false]);
+    expect(costs.map((c) => c.shared)).toEqual([false, true, true, false]);
+  });
+
+  it('lets typed amounts win over the budget without touching it', () => {
+    const before = JSON.stringify(state);
+    const costs = sharedCosts(state, {}, { 'needs:Water': 40, 'needs:Rent': 0 });
+    expect(costs.find((c) => c.label === 'Water')?.amount).toBe(40);
+    expect(costs.find((c) => c.label === 'Rent')?.amount).toBe(0);
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it('feeds typed amounts straight into the split', () => {
+    const costs = sharedCosts(state, {}, { 'needs:Water': 100 });
+    expect(computeCouple(3000, 2000, costs).total).toBe(1000);
   });
 });

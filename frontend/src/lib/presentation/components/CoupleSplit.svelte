@@ -3,6 +3,7 @@
   import { state } from '$lib/application/stores/budgetStore';
   import {
     couple, loadCouple, persistCouple, setPartnerName, setPartnerIncome, setShared, setCustomTotal,
+    setLineAmount, resetLineAmounts,
   } from '$lib/application/stores/coupleStore';
   import { SHARED_CATS, computeCouple, sharedCosts, sharedTotal } from '$lib/domain/couple';
   import { fmt } from '$lib/domain/planner';
@@ -19,7 +20,8 @@
   onDestroy(() => unsubscribe?.());
 
   $: partner = $couple.partnerName.trim() || 'Partner';
-  $: costs = sharedCosts($state, $couple.shared);
+  $: costs = sharedCosts($state, $couple.shared, $couple.amounts);
+  $: hasTypedAmounts = Object.keys($couple.amounts).length > 0;
   $: custom = $couple.customTotal;
   $: lineTotal = sharedTotal(costs);
   $: r = computeCouple($state.takeHome, $couple.partnerIncome, costs, custom);
@@ -34,6 +36,11 @@
       return { ...c, active: true, you, them };
     });
   })();
+
+  function onLineAmount(key: string, current: number, e: CustomEvent<number>) {
+    // A blur that re-sends the figure already showing is not an edit
+    if (e.detail !== current) setLineAmount(key, e.detail);
+  }
 
   function onTotal(e: CustomEvent<number>) {
     // Ignore a blur that re-sends the figure already showing from the budget lines
@@ -137,7 +144,14 @@
       <p class="saves-empty">Add amounts to your budget lines and they appear here to share.</p>
     {/if}
   {:else}
-    <h4 class="list-title">Which costs are shared?</h4>
+    <div class="list-head">
+      <h4 class="list-title">Which costs are shared?</h4>
+      {#if hasTypedAmounts}
+        <button class="ghost-btn compact" type="button" on:click={resetLineAmounts}>
+          Reset amounts to budget
+        </button>
+      {/if}
+    </div>
     {#if custom !== null}
       <p class="kv-note list-note">Your own total is in use, so the budget lines below are set aside.</p>
     {/if}
@@ -159,7 +173,10 @@
                   />
                 </td>
                 <td class="lbl">{c.label}</td>
-                <td class="r num">{fmt(c.amount)}</td>
+                <td class="r amt">
+                  <MoneyInput inputClass="row-amt-input" ariaLabel="{c.label} monthly amount"
+                    value={c.amount} on:change={(e) => onLineAmount(c.key, c.amount, e)} />
+                </td>
                 <td class="r num">{c.active ? fmt(c.you) : '·'}</td>
                 <td class="r num">{c.active ? fmt(c.them) : '·'}</td>
               </tr>
@@ -169,7 +186,7 @@
       {/each}
       <tfoot>
         <tr>
-          <td></td><td>Budget lines total</td>
+          <td></td><td>Shared lines total</td>
           <td class="r num">{fmt(lineTotal)}</td>
           <td class="r num">{custom === null ? fmt(r.owed[0]) : '·'}</td>
           <td class="r num">{custom === null ? fmt(r.owed[1]) : '·'}</td>
@@ -179,6 +196,7 @@
   {/if}
 
   <p class="kv-note">
+    Type an amount on any line to see the split. This is a calculator, so your budget stays as it is.
     Needs are shared by default. Tick any other line to share it.
     For gross pay, more people, or bills paid from different accounts, use
     <a href="/split">Split bills</a>.
@@ -219,7 +237,8 @@
   .total-row .inc-box { width: 150px; flex: none; }
   .total-row .ghost-btn { align-self: center; }
 
-  .list-title { font-size: 13px; margin: 18px 0 4px; }
+  .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 18px 0 4px; }
+  .list-title { font-size: 13px; margin: 0; }
   .list-note { margin: 0 0 4px; }
   .shares.muted { opacity: .55; }
   .shares { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -231,6 +250,8 @@
   .shares td { padding: 6px 6px; border-bottom: 1px solid var(--line); }
   .shares .r { text-align: right; }
   .shares .chk { width: 26px; padding-left: 0; }
+  .shares .amt { width: 120px; padding-top: 3px; padding-bottom: 3px; }
+  .shares .amt :global(.row-amt-input) { width: 100%; }
   .shares .lbl { max-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .shares tr.off td:not(.chk) { color: var(--ink-faint); }
   .shares tfoot td { font-weight: 600; border-bottom: none; border-top: 1px solid var(--line-strong); }

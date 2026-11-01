@@ -9,9 +9,15 @@ export interface CoupleState {
   shared: Record<string, boolean>;
   /** A typed-in total to split instead of the budget lines. Null means use the lines. */
   customTotal: number | null;
+  /** Amounts typed into individual lines, keyed by costKey. They never change the budget. */
+  amounts: Record<string, number>;
 }
 
-const defaults = (): CoupleState => ({ partnerName: 'Partner', partnerIncome: 0, shared: {}, customTotal: null });
+const defaults = (): CoupleState => ({
+  partnerName: 'Partner', partnerIncome: 0, shared: {}, customTotal: null, amounts: {},
+});
+
+const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object';
 
 export const couple = writable<CoupleState>(defaults());
 
@@ -26,6 +32,11 @@ export function loadCouple(): void {
       partnerIncome: typeof p.partnerIncome === 'number' && p.partnerIncome > 0 ? p.partnerIncome : 0,
       shared: p.shared && typeof p.shared === 'object' ? p.shared : {},
       customTotal: typeof p.customTotal === 'number' && p.customTotal > 0 ? p.customTotal : null,
+      amounts: isRecord(p.amounts)
+        ? Object.fromEntries(
+            Object.entries(p.amounts).filter(([, v]) => typeof v === 'number' && v >= 0)
+          ) as Record<string, number>
+        : {},
     });
   } catch {
     /* storage unavailable or corrupt, keep defaults */
@@ -54,6 +65,15 @@ export function setPartnerIncome(partnerIncome: number) {
 /** Zero or empty goes back to using the budget lines. */
 export function setCustomTotal(total: number | null) {
   couple.update((c) => ({ ...c, customTotal: total && total > 0 ? total : null }));
+}
+
+export function setLineAmount(key: string, amount: number) {
+  couple.update((c) => ({ ...c, amounts: { ...c.amounts, [key]: amount } }));
+}
+
+/** Forget every typed amount and go back to the budget's own figures. */
+export function resetLineAmounts() {
+  couple.update((c) => ({ ...c, amounts: {} }));
 }
 
 export function setShared(key: string, on: boolean) {
