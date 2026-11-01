@@ -2,6 +2,7 @@
   import { state, totals } from '$lib/application/stores/budgetStore';
   import { fmt } from '$lib/domain/planner';
   import type { BudgetState } from '$lib/domain/entities/Budget';
+  import MoneyInput from './MoneyInput.svelte';
 
   $: items = $state.oneOff;
   $: subtotal = $totals.oneOff;
@@ -26,62 +27,53 @@
     });
   }
 
-  function onAmt(i: number, e: Event) {
-    const val = parseFloat((e.target as HTMLInputElement).value) || 0;
+  function onAmt(i: number, amount: number) {
     state.update((s) => {
       const next = [...s.oneOff];
-      next[i] = { ...next[i], amount: val };
+      next[i] = { ...next[i], amount };
       return { ...s, oneOff: next } as BudgetState;
     });
   }
 </script>
 
-<div class="card is-collapsible" class:is-collapsed={items.length === 0}>
-  <div
-    class="card-head-row"
-    role="button"
-    tabindex="0"
-    on:click={() => {}}
-    on:keydown={() => {}}
-  >
+<div class="panel-pad">
+  <div class="panel-head">
     <div>
       <h3>One-off costs</h3>
-      <p class="cap">Annual / irregular expenses not in monthly budget</p>
+      <p class="cap">Annual or irregular expenses that aren't in your monthly budget</p>
     </div>
-    <div class="card-head-right">
-      <span class="card-head-total num">{fmt(subtotal)}</span>
-      <span class="collapse-toggle"><span class="chev">▾</span></span>
-    </div>
+    <span class="panel-total num">{fmt(subtotal)}</span>
   </div>
 
-  <div class="card-body">
-    <table class="mini-ledger">
-      <tbody>
-        {#each items as item, i}
-          <tr>
-            <td>
-              <input class="row-label-input" type="text" value={item.label}
-                on:input={(e) => onLabel(i, e)} placeholder="Item" maxlength="80" />
-            </td>
-            <td class="amt-col">
-              <input class="row-amt-input" type="number" min="0" step="1"
-                value={item.amount || ''} on:input={(e) => onAmt(i, e)} placeholder="0" />
-            </td>
-            <td class="del-col">
-              <button class="del-btn" type="button" on:click={() => removeItem(i)}>×</button>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-    <button class="mini-add-btn" type="button" on:click={addItem}>
-      <span class="plus">+</span> Add item
-    </button>
+  {#if items.length === 0}
+    <p class="saves-empty">Nothing here yet. Think car tax, gifts, annual subscriptions.</p>
+  {/if}
+  <table class="mini-ledger">
+    <tbody>
+      {#each items as item, i}
+        <tr>
+          <td>
+            <input class="row-label-input" type="text" value={item.label}
+              on:input={(e) => onLabel(i, e)} placeholder="Item" aria-label="One-off item name" maxlength="80" />
+          </td>
+          <td class="amt-col">
+            <MoneyInput inputClass="row-amt-input" ariaLabel="{item.label || 'One-off'} amount"
+              value={item.amount} on:change={(e) => onAmt(i, e.detail)} />
+          </td>
+          <td class="del-col">
+            <button class="del-btn" type="button" aria-label="Remove {item.label || 'item'}" on:click={() => removeItem(i)}>×</button>
+          </td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+  <button class="mini-add-btn" type="button" on:click={addItem}>
+    <span class="plus">+</span> Add item
+  </button>
 
-    {#if subtotal > 0}
-      <p class="kv-note">
-        {fmt(subtotal)} / yr · roughly <strong>{fmt(subtotal / 12)}</strong> per month to set aside
-      </p>
-    {/if}
-  </div>
+  {#if subtotal > 0}
+    <p class="kv-note">
+      Roughly <strong>{fmt(subtotal / 12)}</strong> a month to set aside
+    </p>
+  {/if}
 </div>

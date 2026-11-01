@@ -15,7 +15,7 @@ test.describe('Planner', () => {
   });
 
   test('entering take-home updates the hero card', async ({ page }) => {
-    const input = page.locator('.hero-take-home');
+    const input = page.locator('.income-take-home');
     await input.fill('3000');
     await input.dispatchEvent('input');
     await expect(input).toHaveValue('3,000');
@@ -26,7 +26,7 @@ test.describe('Planner', () => {
     await expect(page.locator('.row-label-input').first()).toHaveValue('Rent / mortgage');
     await page.locator('.row-amt-input').first().fill('800');
 
-    await expect(page.locator('.group-head .subtotal').first()).toContainText('800');
+    await expect(page.locator('#tab-needs .tab-meta')).toContainText('800');
   });
 
   test('auto-save fires after entering data', async ({ page }) => {
@@ -35,7 +35,7 @@ test.describe('Planner', () => {
       { timeout: 5000 }
     );
 
-    const input = page.locator('.hero-take-home');
+    const input = page.locator('.income-take-home');
     await input.fill('2500');
     await input.dispatchEvent('input');
 
@@ -52,10 +52,10 @@ test.describe('Planner', () => {
   });
 
   test('gauges render after take-home is entered', async ({ page }) => {
-    const input = page.locator('.hero-take-home');
+    const input = page.locator('.income-take-home');
     await input.fill('2000');
     await input.dispatchEvent('input');
 
-    await expect(page.locator('.gauge-card')).toHaveCount(3);
+    await expect(page.locator('.ov-row')).toHaveCount(3);
   });
 });

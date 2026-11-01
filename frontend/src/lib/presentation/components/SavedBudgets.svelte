@@ -58,16 +58,20 @@
   }
 </script>
 
-<div class="card">
-  <h3>Saved budgets</h3>
-  <p class="cap">Save snapshots to compare or revisit later</p>
+<div class="panel-pad">
+  <div class="panel-head">
+    <div>
+      <h3>Snapshots</h3>
+      <p class="cap">Save the current budget to compare or revisit later</p>
+    </div>
+  </div>
 
   <div class="save-row">
     <input
       class="save-name-input"
       class:is-flagged={isFlagged}
       type="text"
-      placeholder="Save name…"
+      placeholder="Snapshot name…" aria-label="Snapshot name"
       bind:value={saveName}
       maxlength="60"
       on:keydown={(e) => e.key === 'Enter' && saveNamed()}
@@ -79,7 +83,7 @@
 
   <div class="saves-list">
     {#if $saves.length === 0}
-      <p class="saves-empty">No saves yet.</p>
+      <p class="saves-empty">No snapshots yet.</p>
     {:else}
       {#each $saves as budget (budget.id)}
         <div class="save-item">

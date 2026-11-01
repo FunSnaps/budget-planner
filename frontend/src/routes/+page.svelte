@@ -1,19 +1,15 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { state } from '$lib/application/stores/budgetStore';
-  import { initStores } from '$lib/application/stores/budgetStore';
+  import { state, initStores } from '$lib/application/stores/budgetStore';
+  import { toasts } from '$lib/application/stores/toastStore';
   import { autoSaveBudget, cancelAutoSave } from '$lib/application/use-cases/autoSaveBudget';
   import { migrateLegacyData } from '$lib/application/use-cases/migrateLegacyData';
   import { BudgetApiService } from '$lib/infrastructure/api/BudgetApiService';
 
-  import HeroCard from '$lib/presentation/components/HeroCard.svelte';
-  import Gauges from '$lib/presentation/components/Gauges.svelte';
-  import SpendingRegister from '$lib/presentation/components/SpendingRegister.svelte';
-  import CompositionBar from '$lib/presentation/components/CompositionBar.svelte';
-  import FlagBanner from '$lib/presentation/components/FlagBanner.svelte';
-  import BonusTracker from '$lib/presentation/components/BonusTracker.svelte';
-  import OneOffCard from '$lib/presentation/components/OneOffCard.svelte';
-  import SavedBudgets from '$lib/presentation/components/SavedBudgets.svelte';
+  import AppHeader from '$lib/presentation/components/AppHeader.svelte';
+  import IncomeCard from '$lib/presentation/components/IncomeCard.svelte';
+  import Overview from '$lib/presentation/components/Overview.svelte';
+  import BudgetPanel from '$lib/presentation/components/BudgetPanel.svelte';
 
   import type { PageData } from './$types';
 
@@ -22,14 +18,14 @@
   const service = new BudgetApiService();
   const scheduleAutoSave = autoSaveBudget(service);
 
-  let migrated = false;
-
   onMount(async () => {
     if (data.activeBudget) {
       initStores(data.activeBudget, data.saves ?? []);
     }
 
-    migrated = await migrateLegacyData(service);
+    if (await migrateLegacyData(service)) {
+      toasts.show('Your local budget data has been moved to your account.');
+    }
   });
 
   onDestroy(() => {
@@ -43,46 +39,20 @@
   } else {
     firstRun = false;
   }
-
-  async function logout() {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/login';
-  }
 </script>
 
 <svelte:head><title>Budget Planner</title></svelte:head>
 
-<div class="page">
-  <header class="masthead">
-    <p class="eyebrow">50 / 30 / 20 Budget Planner</p>
-    <h1>Your budget</h1>
-    {#if data.user}
-      <p class="sub">
-        <a href="/split" style="color:var(--accent);text-decoration:none">Split shared bills →</a> ·
-        {data.user.email} ·
-        <button
-          class="ghost-btn"
-          style="padding:2px 8px;font-size:12px"
-          on:click={logout}
-        >Sign out</button>
-      </p>
-    {/if}
-    {#if migrated}
-      <p class="sub" style="color:var(--good)">
-        Your local budget data has been migrated to the cloud.
-      </p>
-    {/if}
-  </header>
+<div class="app">
+  <AppHeader active="budget" showSaveStatus />
 
-  <HeroCard />
-
-  <Gauges />
-  <CompositionBar />
-  <FlagBanner />
-
-  <SpendingRegister />
-
-  <OneOffCard />
-  <BonusTracker />
-  <SavedBudgets {service} />
+  <main class="app-main">
+    <div class="col col-side">
+      <IncomeCard />
+      <Overview />
+    </div>
+    <div class="col col-content">
+      <BudgetPanel {service} />
+    </div>
+  </main>
 </div>

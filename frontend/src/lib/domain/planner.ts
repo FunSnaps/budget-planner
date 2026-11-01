@@ -29,6 +29,10 @@ export function fmt(n: number): string {
   return n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 2 });
 }
 
+export function fmtWhole(n: number): string {
+  return n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 });
+}
+
 export function pct(value: number, total: number): number {
   if (!total) return 0;
   return round2((value / total) * 100);

@@ -8,6 +8,7 @@
   } from '$lib/application/stores/splitStore';
   import { fmt, estimateTakeHome, monthlyFromAnnual } from '$lib/domain/planner';
   import MoneyInput from '$lib/presentation/components/MoneyInput.svelte';
+  import AppHeader from '$lib/presentation/components/AppHeader.svelte';
 
   const COLORS = ['#0088a0', '#c98a00', '#0ca30c', '#8a4fd3', '#d33f6a', '#4f6bd3'];
 
@@ -20,9 +21,6 @@
 
   function str(e: Event): string {
     return (e.target as HTMLInputElement | HTMLSelectElement).value;
-  }
-  function num(e: Event): number {
-    return parseFloat(str(e)) || 0;
   }
 
   function estimate(id: string, gross: number) {
@@ -40,16 +38,11 @@
 
 <svelte:head><title>Split bills · Budget Planner</title></svelte:head>
 
-<div class="page">
-  <header class="masthead">
-    <p class="eyebrow">Shared finances</p>
-    <h1>Split bills by income</h1>
-    <p class="sub">
-      Everyone pays the same share of their income towards shared bills, instead of a flat 50/50.
-      <a href="/" class="back">← Back to budget</a>
-    </p>
-  </header>
+<div class="app">
+  <AppHeader active="split" />
 
+  <main class="app-main is-split">
+  <div class="col col-side">
   <div class="card">
     <div class="head-row">
       <div>
@@ -67,27 +60,31 @@
     </div>
 
     <div class="people">
+      <div class="person people-head" aria-hidden="true">
+        <span></span>
+        <span>Name</span>
+        <span class="r" class:dim={$split.basis !== 'gross'}>Gross / yr</span>
+        <span class="r" class:dim={$split.basis !== 'takeHome'}>Take-home / mo</span>
+        <span></span>
+        <span></span>
+      </div>
       {#each people as p, i (p.id)}
         <div class="person">
           <span class="swatch" style="background:{COLORS[i % COLORS.length]}"></span>
           <input
-            class="name-input" type="text" maxlength="40" placeholder="Name"
+            class="name-input" type="text" maxlength="40" placeholder="Name" aria-label="Name"
             value={p.name} on:input={(e) => updatePerson(p.id, { name: str(e) })}
           />
-          <div class="money" class:dim={$split.basis !== 'gross'}>
-            <span class="lbl">Gross / yr</span>
-            <span class="field"><span class="cur">£</span>
-              <MoneyInput inputClass="mini-input" ariaLabel="Gross salary per year"
-                value={p.gross} on:change={(e) => updatePerson(p.id, { gross: e.detail })} />
-            </span>
-          </div>
-          <div class="money" class:dim={$split.basis !== 'takeHome'}>
-            <span class="lbl">Take-home / mo</span>
-            <span class="field"><span class="cur">£</span>
-              <MoneyInput inputClass="mini-input" ariaLabel="Take-home per month"
-                value={p.takeHome} on:change={(e) => updatePerson(p.id, { takeHome: e.detail })} />
-            </span>
-          </div>
+          <span class="inc-field" class:dim={$split.basis !== 'gross'}>
+            <span class="cur">£</span>
+            <MoneyInput inputClass="mini-input" ariaLabel="Gross salary per year"
+              value={p.gross} on:change={(e) => updatePerson(p.id, { gross: e.detail })} />
+          </span>
+          <span class="inc-field" class:dim={$split.basis !== 'takeHome'}>
+            <span class="cur">£</span>
+            <MoneyInput inputClass="mini-input" ariaLabel="Take-home per month"
+              value={p.takeHome} on:change={(e) => updatePerson(p.id, { takeHome: e.detail })} />
+          </span>
           <button
             class="ghost-btn tiny" type="button"
             disabled={!p.gross} title="Estimate monthly take-home from gross (UK 2024/25)"
@@ -146,8 +143,8 @@
               </select>
             </td>
             <td class="amt-col">
-              <input class="row-amt-input" type="number" min="0" step="1" placeholder="0"
-                value={b.amount || ''} on:input={(e) => updateBill(b.id, { amount: num(e) })} />
+              <MoneyInput inputClass="row-amt-input" ariaLabel="{b.label || 'Bill'} monthly amount"
+                value={b.amount} on:change={(e) => updateBill(b.id, { amount: e.detail })} />
             </td>
             <td class="del-col">
               <button class="del-btn" type="button" aria-label="Remove bill" on:click={() => removeBill(b.id)}>×</button>
@@ -166,6 +163,9 @@
     </div>
   </div>
 
+  </div>
+
+  <div class="col col-content">
   {#if hasBills}
     <div class="card">
       <h3>Who pays what</h3>
@@ -234,18 +234,22 @@
         </table>
       </div>
     </div>
+  {:else}
+    <div class="card empty-state">
+      <h3>Who pays what</h3>
+      <p class="cap">Add an amount to a bill and each person's share appears here.</p>
+    </div>
   {/if}
 
   <div class="footer-row">
     <p class="kv-note">Saved in this browser only.</p>
     <button class="ghost-btn danger" type="button" on:click={resetSplit}>Reset</button>
   </div>
+  </div>
+  </main>
 </div>
 
 <style>
-  .back { margin-left: 10px; color: var(--accent); text-decoration: none; white-space: nowrap; }
-  .back:hover { text-decoration: underline; }
-
   .head-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
   .head-row .cap { margin-bottom: 0; }
 
@@ -257,29 +261,34 @@
   .seg button + button { border-left: 1px solid var(--line-strong); }
   .seg button.on { background: var(--accent); color: var(--accent-ink); }
 
-  .people { display: flex; flex-direction: column; margin-top: 14px; }
+  .people { display: flex; flex-direction: column; margin-top: 12px; }
   .person {
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    padding: 10px 0; border-bottom: 1px solid var(--line);
+    display: grid; grid-template-columns: 10px minmax(80px, 1fr) 112px 112px auto 24px;
+    align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line);
   }
   .person:last-child { border-bottom: none; }
-  .swatch { width: 10px; height: 28px; border-radius: 2.5px; flex: none; }
+  .people-head {
+    padding: 0 0 6px; border-bottom: 1px solid var(--line);
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); font-weight: 600;
+  }
+  .people-head .r { text-align: right; padding-right: 2px; }
+  .swatch { width: 10px; height: 26px; border-radius: 2.5px; }
   .name-input {
-    flex: 1 1 120px; min-width: 100px; background: transparent; border: none;
-    border-bottom: 1px solid transparent; color: var(--ink); font: 600 15px "IBM Plex Sans", sans-serif; padding: 4px 2px;
+    min-width: 0; background: transparent; border: none;
+    border-bottom: 1px solid transparent; color: var(--ink); font: 600 14.5px "IBM Plex Sans", sans-serif; padding: 4px 2px;
   }
   .name-input:hover { border-bottom-color: var(--line-strong); }
   .name-input:focus { outline: none; border-bottom-color: var(--accent); }
 
-  .money { display: flex; flex-direction: column; gap: 2px; }
-  .money.dim { opacity: .55; }
-  .money .lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); font-weight: 600; }
-  .money .field { display: flex; align-items: baseline; gap: 3px; }
-  .money .cur { color: var(--ink-faint); font-size: 13px; }
+  .inc-field { display: flex; align-items: baseline; gap: 3px; border-bottom: 1.5px solid var(--line-strong); min-width: 0; }
+  .inc-field:focus-within { border-bottom-color: var(--accent); }
+  .inc-field .cur { color: var(--ink-faint); font-size: 13px; }
+  .inc-field :global(.mini-input) { width: 100%; min-width: 0; border-bottom: none; }
+  .dim { opacity: .5; }
   .tiny { padding: 4px 9px; font-size: 11.5px; }
   .tiny:disabled, .del-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-  .bar { display: flex; height: 12px; border-radius: 3px; overflow: hidden; margin-top: 16px; gap: 2px; }
+  .bar { display: flex; height: 12px; border-radius: 3px; overflow: hidden; margin-top: 14px; gap: 2px; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 9px; font-size: 13px; color: var(--ink-soft); }
   .dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 5px; }
 
