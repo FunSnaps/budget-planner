@@ -2,9 +2,9 @@
   import { onMount, onDestroy } from 'svelte';
   import { state } from '$lib/application/stores/budgetStore';
   import {
-    couple, loadCouple, persistCouple, setPartnerName, setPartnerIncome, setShared,
+    couple, loadCouple, persistCouple, setPartnerName, setPartnerIncome, setShared, setCustomTotal,
   } from '$lib/application/stores/coupleStore';
-  import { SHARED_CATS, computeCouple, sharedCosts } from '$lib/domain/couple';
+  import { SHARED_CATS, computeCouple, sharedCosts, sharedTotal } from '$lib/domain/couple';
   import { fmt } from '$lib/domain/planner';
   import MoneyInput from './MoneyInput.svelte';
 
@@ -20,17 +20,26 @@
 
   $: partner = $couple.partnerName.trim() || 'Partner';
   $: costs = sharedCosts($state, $couple.shared);
-  $: r = computeCouple($state.takeHome, $couple.partnerIncome, costs);
+  $: custom = $couple.customTotal;
+  $: lineTotal = sharedTotal(costs);
+  $: r = computeCouple($state.takeHome, $couple.partnerIncome, costs, custom);
 
-  // Per-line shares: the engine only sees the shared lines, so walk both lists in step
+  // Per-line shares: the engine only sees the shared lines, so walk both lists in step.
+  // A custom total replaces the lines, so none of them take part.
   $: rows = (() => {
     let next = 0;
     return costs.map((c) => {
-      if (!c.shared) return { ...c, you: 0, them: 0 };
+      if (!c.shared || custom !== null) return { ...c, active: false, you: 0, them: 0 };
       const [you, them] = r.shares[next++];
-      return { ...c, you, them };
+      return { ...c, active: true, you, them };
     });
   })();
+
+  function onTotal(e: CustomEvent<number>) {
+    // Ignore a blur that re-sends the figure already showing from the budget lines
+    if (custom === null && e.detail === lineTotal) return;
+    setCustomTotal(e.detail);
+  }
 
   $: youPct = r.fractions[0] * 100;
   $: themPct = r.fractions[1] * 100;
@@ -87,9 +96,24 @@
     </p>
   {/if}
 
-  {#if costs.length === 0}
-    <p class="saves-empty">Add amounts to your budget lines and they appear here to share.</p>
-  {:else}
+  <div class="total-row">
+    <span class="inc-label">Amount to split</span>
+    <span class="inc-box inc-edit">
+      <span class="cur">£</span>
+      <MoneyInput inputClass="mini-input" ariaLabel="Amount to split per month"
+        value={custom ?? lineTotal} on:change={onTotal} />
+      <span class="inc-hint">/ mo</span>
+    </span>
+    {#if custom !== null}
+      <button class="ghost-btn compact" type="button" on:click={() => setCustomTotal(null)}>
+        Use budget lines{lineTotal > 0 ? ` (${fmt(lineTotal)})` : ''}
+      </button>
+    {:else}
+      <span class="inc-hint">from the ticked lines below. Type a figure to use your own.</span>
+    {/if}
+  </div>
+
+  {#if r.total > 0}
     <div class="results">
       <div class="result">
         <div class="k"><span class="dot" style="background:{YOU}"></span>You pay</div>
@@ -106,9 +130,18 @@
         </div>
       </div>
     </div>
+  {/if}
 
+  {#if costs.length === 0}
+    {#if custom === null}
+      <p class="saves-empty">Add amounts to your budget lines and they appear here to share.</p>
+    {/if}
+  {:else}
     <h4 class="list-title">Which costs are shared?</h4>
-    <table class="shares">
+    {#if custom !== null}
+      <p class="kv-note list-note">Your own total is in use, so the budget lines below are set aside.</p>
+    {/if}
+    <table class="shares" class:muted={custom !== null}>
       <thead>
         <tr><th class="chk"></th><th></th><th class="r">Total</th><th class="r">You</th><th class="r">{partner}</th></tr>
       </thead>
@@ -127,8 +160,8 @@
                 </td>
                 <td class="lbl">{c.label}</td>
                 <td class="r num">{fmt(c.amount)}</td>
-                <td class="r num">{c.shared ? fmt(c.you) : '·'}</td>
-                <td class="r num">{c.shared ? fmt(c.them) : '·'}</td>
+                <td class="r num">{c.active ? fmt(c.you) : '·'}</td>
+                <td class="r num">{c.active ? fmt(c.them) : '·'}</td>
               </tr>
             {/each}
           </tbody>
@@ -136,10 +169,10 @@
       {/each}
       <tfoot>
         <tr>
-          <td></td><td>Shared total</td>
-          <td class="r num">{fmt(r.total)}</td>
-          <td class="r num">{fmt(r.owed[0])}</td>
-          <td class="r num">{fmt(r.owed[1])}</td>
+          <td></td><td>Budget lines total</td>
+          <td class="r num">{fmt(lineTotal)}</td>
+          <td class="r num">{custom === null ? fmt(r.owed[0]) : '·'}</td>
+          <td class="r num">{custom === null ? fmt(r.owed[1]) : '·'}</td>
         </tr>
       </tfoot>
     </table>
@@ -182,7 +215,13 @@
   .result .v { font-size: 22px; font-weight: 600; margin-top: 3px; }
   .result .note { font-size: 11.5px; color: var(--ink-faint); margin-top: 2px; }
 
+  .total-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 14px; margin-top: 16px; }
+  .total-row .inc-box { width: 150px; flex: none; }
+  .total-row .ghost-btn { align-self: center; }
+
   .list-title { font-size: 13px; margin: 18px 0 4px; }
+  .list-note { margin: 0 0 4px; }
+  .shares.muted { opacity: .55; }
   .shares { width: 100%; border-collapse: collapse; font-size: 13px; }
   .shares th {
     text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;

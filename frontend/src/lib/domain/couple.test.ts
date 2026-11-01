@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeCouple, sharedCosts, type SharedCost } from './couple';
+import { computeCouple, sharedCosts, sharedTotal, type SharedCost } from './couple';
 import { EMPTY_STATE } from './entities/Budget';
 
 const cost = (label: string, amount: number, shared = true): SharedCost => ({
@@ -27,6 +27,16 @@ describe('computeCouple', () => {
     const r = computeCouple(0, 0, [cost('Rent', 1000)]);
     expect(r.usedEqualFallback).toBe(true);
     expect(r.owed).toEqual([500, 500]);
+  });
+
+  it('uses a custom total instead of the budget lines', () => {
+    const r = computeCouple(3000, 2000, [cost('Rent', 1000)], 2500);
+    expect(r.total).toBe(2500);
+    expect(r.owed).toEqual([1500, 1000]);
+  });
+
+  it('sums only the shared lines', () => {
+    expect(sharedTotal([cost('Rent', 1000), cost('Gym', 50, false), cost('Gas', 60)])).toBe(1060);
   });
 
   it('puts everything on the earner when the partner has no income', () => {

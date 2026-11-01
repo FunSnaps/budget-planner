@@ -38,14 +38,30 @@ export function sharedCosts(state: BudgetState, shared: Record<string, boolean>)
   );
 }
 
-/** Split the shared costs between two people in proportion to their take-home pay. */
-export function computeCouple(yourIncome: number, partnerIncome: number, costs: SharedCost[]): SplitResult {
+/** What the ticked budget lines add up to. */
+export function sharedTotal(costs: SharedCost[]): number {
+  return costs.reduce((sum, c) => sum + (c.shared ? c.amount : 0), 0);
+}
+
+/**
+ * Split the shared costs between two people in proportion to their take-home pay.
+ * A custom total replaces the budget lines entirely.
+ */
+export function computeCouple(
+  yourIncome: number,
+  partnerIncome: number,
+  costs: SharedCost[],
+  customTotal: number | null = null
+): SplitResult {
   const people = [
     { id: 'you', name: 'You', gross: 0, takeHome: yourIncome },
     { id: 'partner', name: 'Partner', gross: 0, takeHome: partnerIncome },
   ];
-  const bills = costs
-    .filter((c) => c.shared)
-    .map((c) => ({ id: c.key, label: c.label, amount: c.amount, paidBy: 'you' }));
+  const bills =
+    customTotal !== null
+      ? [{ id: 'custom', label: 'Custom total', amount: customTotal, paidBy: 'you' }]
+      : costs
+          .filter((c) => c.shared)
+          .map((c) => ({ id: c.key, label: c.label, amount: c.amount, paidBy: 'you' }));
   return computeSplit(people, bills, 'takeHome');
 }
